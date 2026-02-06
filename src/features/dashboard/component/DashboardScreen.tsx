@@ -1,7 +1,8 @@
 // src/pages/dashboard/Dashboard.tsx
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import {menuSections, type NavItem, standaloneLinks} from "@/features/dashboard/types/DashboardType.ts";
+import type {NavItem} from "@/types/navigationTypes.ts";
+import {menuSections, standaloneLinks} from "@/config/navigation.ts";
 
 // Componente Pequeño para la Tarjeta (Card)
 const DashboardCard = ({ item }: { item: NavItem }) => {

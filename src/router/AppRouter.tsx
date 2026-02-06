@@ -3,6 +3,7 @@ import { LoginForm } from '@/features/auth/components/LoginForm';
 import { RegisterForm } from '@/features/auth/components/RegisterForm';
 import { MainLayout } from '@/components/layout/MainLayout';
 import {Dashboard} from "@/features/dashboard/component/DashboardScreen.tsx";
+import { PartnersList } from '@/features/partner/pages/PartnersList';
 
 export const AppRouter = () => {
     return (
@@ -27,7 +28,7 @@ export const AppRouter = () => {
 
                 {/* Socios */}
                 <Route path="/socios/datos" element={<div>Datos del Socio</div>} />
-                <Route path="/socios/lista" element={<div>Lista de Socios</div>} />
+                <Route path="/socios/lista" element={<PartnersList />} />
                 <Route path="/socios/directivos" element={<div>Directivos</div>} />
 
                 {/* Generales */}
