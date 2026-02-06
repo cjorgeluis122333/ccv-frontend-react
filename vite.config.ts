@@ -2,13 +2,17 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
-// https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [react()],
-  base: '/ccv-frontend-react/', // Importante para GitHub Pages
+  // Si estamos en 'build' (producción), usamos la ruta del repo.
+  // Si estamos en 'serve' (local), usamos la raíz.
+  base: command === 'build' ? '/ccv-frontend-react/' : '/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
   },
-});
+}));
+
+
+
