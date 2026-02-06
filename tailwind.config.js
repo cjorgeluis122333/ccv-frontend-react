@@ -2,19 +2,18 @@
 export default {
     content: [
         "./index.html",
-        "./src/**/*.{js,ts,jsx,tsx}",
+        "./src/**/*.{js,ts,jsx,tsx}", // Esto es vital: le dice a Tailwind que lea tus componentes
     ],
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Inter', 'sans-serif'], // Ya que instalaste @fontsource/inter
+                sans: ['Inter', 'sans-serif'],
                 mono: ['JetBrains Mono', 'monospace'],
             },
             colors: {
-                // Define tu paleta aquí para consistencia
                 primary: {
-                    DEFAULT: '#3b82f6',
-                    foreground: '#ffffff'
+                    DEFAULT: '#2563eb', // blue-600
+                    dark: '#1d4ed8',    // blue-700
                 }
             }
         },
