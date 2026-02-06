@@ -1,80 +1,98 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import {Link, useNavigate} from 'react-router-dom';
+import { useState } from 'react';
+
 import { loginSchema } from '../schemas/authSchemas';
 import { authService } from '../services/authService';
-import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import {Input} from "@/components/Input.tsx";
+import {Button} from "@/components/Button.tsx";
 import type { z } from 'zod';
 
 // Inferimos el tipo TypeScript automáticamente desde Zod
 type LoginFormInputs = z.infer<typeof loginSchema>;
-
 export const LoginForm = () => {
     const navigate = useNavigate();
-    const [error, setError] = useState<string | null>(null);
+    const [serverError, setServerError] = useState<string | null>(null);
 
-    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormInputs>({
+    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
         resolver: zodResolver(loginSchema)
     });
 
     const onSubmit = async (data: LoginFormInputs) => {
-        setError(null);
+        setServerError(null);
         try {
             const response = await authService.login(data);
             authService.setSession(response.access_token);
             // Aquí podrías guardar el 'response.user' en un Global Store (Context/Zustand)
             console.log("Bienvenido:", response.socio_info.nombre);
             navigate('/dashboard');
-        } catch (err: any) {
-            console.error(err);
-            setError("Credenciales inválidas o error de conexión");
+        } catch  {
+            setServerError("Credenciales inválidas o error de conexión\"");
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-xl shadow-lg border border-gray-100">
-                <h2 className="text-3xl font-bold text-center text-gray-900">Iniciar Sesión</h2>
+        <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8fafc] p-4">
+            {/* Contenedor Principal */}
+            <div className="w-full max-w-[400px] bg-white p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
 
-                {error && (
-                    <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm text-center">
-                        {error}
+                {/* Cabecera */}
+                <div className="text-center space-y-2 mb-8">
+
+                    <h1 className="text-2xl font-black text-slate-900 tracking-tight">Bienvenido</h1>
+                    <p className="text-slate-500 text-sm">Ingresa tus credenciales para acceder</p>
+                </div>
+
+                {serverError && (
+                    <div className="mb-6 p-3 rounded-xl bg-red-50 border border-red-100 text-red-600 text-xs font-semibold text-center animate-shake">
+                        {serverError}
                     </div>
                 )}
 
-                <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-                    <div className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Acción (Número)</label>
-                            <input
-                                {...register("acc")}
-                                type="text"
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2 border"
-                                placeholder="Ej: 1"
-                            />
-                            {errors.acc && <p className="text-red-500 text-xs mt-1">{errors.acc.message}</p>}
-                        </div>
+                {/* Formulario */}
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                    <Input
+                        label="Número de Acción"
+                        placeholder="Ej: 1234"
+                        error={errors.acc?.message as string}
+                        {...register("acc")}
+                    />
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Contraseña</label>
-                            <input
-                                {...register("password")}
-                                type="password"
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm p-2 border"
-                            />
-                            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
-                        </div>
-                    </div>
+                    <Input
+                        label="Contraseña"
+                        type="password"
+                        placeholder="••••••••"
+                        error={errors.password?.message as string}
+                        {...register("password")}
+                    />
 
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-                    >
-                        {isSubmitting ? 'Entrando...' : 'Ingresar'}
-                    </button>
+                    {/*<div className="flex justify-end">*/}
+                    {/*    <button type="button" className="text-xs font-bold text-blue-600 hover:text-blue-700 ">*/}
+                    {/*        ¿Olvidaste tu contraseña?*/}
+                    {/*    </button>*/}
+                    {/*</div>*/}
+
+                    <Button type="submit" isLoading={isSubmitting}>
+                        Iniciar Sesión
+                    </Button>
                 </form>
+
+                {/* Footer de Registro */}
+                <div className="mt-8 pt-6 border-t border-slate-50 text-center">
+                    <p className="text-sm text-slate-500">
+                        ¿Aún no tienes cuenta?{' '}
+                        <Link to="/register" className="font-bold text-blue-600 hover:text-blue-700 transition-colors">
+                            Regístrate ahora
+                        </Link>
+                    </p>
+                </div>
             </div>
+
+            {/* Footer secundario */}
+            <p className="mt-8 text-xs text-slate-400 font-medium">
+                © 2026 CCV User Interface. Todos los derechos reservados.
+            </p>
         </div>
     );
 };
