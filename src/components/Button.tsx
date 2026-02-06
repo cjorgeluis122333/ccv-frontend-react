@@ -1,4 +1,5 @@
-import {cn} from "@/utils/utils.ts";
+import {cn} from "@/lib/utils.ts";
+import * as React from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     isLoading?: boolean;
