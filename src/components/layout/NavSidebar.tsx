@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
 import { menuSections, standaloneLinks } from '@/config/navigation';
 import { SidebarGroup, SidebarLink } from './SidebarItems';
+import {Link} from "react-router-dom";
 
 interface NavSidebarProps {
     isExpanded: boolean;
@@ -44,9 +45,11 @@ export const NavSidebar = ({ isExpanded, onToggle }: NavSidebarProps) => {
                 "flex flex-col items-center mb-8 px-4 transition-all duration-300",
                 isExpanded ? "opacity-100 translate-y-0" : "opacity-0 invisible translate-y-4 h-0 overflow-hidden"
             )}>
-                <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-blue-200 mb-4">
-                    CCV
-                </div>
+                <Link to="/dashboard" className="group"> {/* Envolvemos en Link */}
+                    <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-blue-200 mb-4 transition-transform group-hover:scale-105 group-active:scale-95">
+                        CCV
+                    </div>
+                </Link>
                 <h2 className="font-bold text-slate-900 text-center line-clamp-1">Tu Empresa S.A.</h2>
             </div>
 

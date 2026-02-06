@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { LoginForm } from '@/features/auth/components/LoginForm';
 import { RegisterForm } from '@/features/auth/components/RegisterForm';
 import { MainLayout } from '@/components/layout/MainLayout';
+import {Dashboard} from "@/features/dashboard/component/DashboardScreen.tsx";
 
 export const AppRouter = () => {
     return (
@@ -12,7 +13,7 @@ export const AppRouter = () => {
 
             {/* Rutas Protegidas (Layout con Drawer) */}
             <Route element={<MainLayout />}>
-                <Route path="/dashboard" element={<div>Bienvenido al Dashboard</div>} />
+                <Route path="/dashboard" element={<Dashboard/>} />
 
                 {/* Pagos */}
                 <Route path="/pagos" element={<div>Pantalla de Pagos</div>} />
