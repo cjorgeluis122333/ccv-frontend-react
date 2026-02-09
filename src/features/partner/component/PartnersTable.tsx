@@ -33,7 +33,6 @@ export const PartnersTable = ({ data, isLoading }: PartnersTableProps) => {
                         <th className="px-6 py-4">Cédula</th>
                         <th className="px-6 py-4">Contacto</th>
                         <th className="px-6 py-4">Fecha Nac.</th>
-                        <th className="px-6 py-4 text-right">Estado</th>
                     </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
@@ -46,10 +45,7 @@ export const PartnersTable = ({ data, isLoading }: PartnersTableProps) => {
                                 #{partner.acc}
                             </td>
                             <td className="px-6 py-4">
-                                <div className="font-semibold text-slate-800">{partner.nombre}</div>
-                                <div className="text-xs text-slate-400 group-hover:text-blue-500 transition-colors">
-                                    Socio Regular
-                                </div>
+                                <div className="font-semibold text-slate-800 group-hover:text-blue-500 transition-colors">{partner.nombre}</div>
                             </td>
                             <td className="px-6 py-4 font-mono text-slate-600">
                                 {partner.cedula > 0 ? partner.cedula.toLocaleString() : 'N/A'}
@@ -72,14 +68,10 @@ export const PartnersTable = ({ data, isLoading }: PartnersTableProps) => {
                                     ) : null}
                                 </div>
                             </td>
-                            <td className="px-6 py-4 text-slate-600">
+                            <td className="px-6 py-4 font-mono text-slate-400 font-medium">
                                 {partner.nacimiento}
                             </td>
-                            <td className="px-6 py-4 text-right">
-                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
-                                        Activo
-                                    </span>
-                            </td>
+
                         </tr>
                     ))}
                     </tbody>

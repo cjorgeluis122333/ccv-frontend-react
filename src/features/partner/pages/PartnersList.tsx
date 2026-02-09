@@ -22,10 +22,6 @@ export const PartnersList = () => {
                     >
                         <span className="material-symbols-rounded text-xl">refresh</span>
                     </button>
-                    <button className="px-5 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 hover:shadow-blue-300 transition-all active:scale-95 flex items-center gap-2">
-                        <span className="material-symbols-rounded text-lg">add</span>
-                        Nuevo Socio
-                    </button>
                 </div>
             </div>
 
