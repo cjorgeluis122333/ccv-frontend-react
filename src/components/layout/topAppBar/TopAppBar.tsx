@@ -15,9 +15,12 @@ export const TopBar = () => {
 
     // Helper para obtener iniciales (Ej: "Juan Perez" -> "JP")
     const getInitials = (name: string | undefined) => {
-        if (!name) return "US";
+        // .trim() elimina espacios al inicio y final
+        if (!name || !name.trim()) return "US";
+
         return name
-            .split(' ')
+            .trim()
+            .split(/\s+/)
             .map(n => n[0])
             .slice(0, 2)
             .join('')
