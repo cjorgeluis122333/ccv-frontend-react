@@ -8,6 +8,7 @@ import { authService } from '../services/authService';
 import {Input} from "@/components/Input.tsx";
 import {Button} from "@/components/Button.tsx";
 import type { z } from 'zod';
+import type {UserInfo} from "@/features/auth/types/userInfoType.ts";
 
 // Inferimos el tipo TypeScript automáticamente desde Zod
 type LoginFormInputs = z.infer<typeof loginSchema>;
@@ -22,9 +23,18 @@ export const LoginForm = () => {
     const onSubmit = async (data: LoginFormInputs) => {
         setServerError(null);
         try {
+            // 1. Hacemos la petición
             const response = await authService.login(data);
-            authService.setSession(response.access_token);
-            // Aquí podrías guardar el 'response.user' en un Global Store (Context/Zustand)
+            // 2. Make a mapper
+            const userToSave: UserInfo = {
+                action: response.socio_info.acc,       // Mapeamos 'acc' a 'action'
+                email: response.socio_info.correo,     // Mapeamos 'correo' a 'email'
+                name: response.socio_info.nombre,      // Mapeamos 'nombre' a 'name'
+                occupation: response.socio_info.ocupacion // Mapeamos 'ocupacion' a 'occupation'
+            };
+
+            // 3. Guardamos en sesión el token y el objeto YA convertido
+            authService.setSession(response.access_token, userToSave); // Aquí podrías guardar el 'response.user' en un Global Store (Context/Zustand)
             console.log("Bienvenido:", response.socio_info.nombre);
             navigate('/dashboard');
         } catch  {

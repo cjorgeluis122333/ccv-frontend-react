@@ -26,35 +26,3 @@ export interface SocioInfo {
     categoria: string;
     cobrador: number;
 }
-
-// Respuesta de Login
-export interface LoginResponse {
-    status: string;
-    access_token: string;
-    token_type: string;
-    user: User;
-    socio_info: SocioInfo;
-}
-
-// Respuesta de Registro
-export interface RegisterResponse {
-    status: string;
-    message: string;
-    access_token: string;
-    user: User;
-    member_details: SocioInfo; // Nota: Tu API devuelve nombres distintos (socio_info vs member_details)
-}
-
-// Tipos para los formularios (Inputs)
-export interface LoginCredentials {
-    acc: string; // Lo manejamos como string en el input, aunque se envíe número
-    password: string;
-}
-
-export interface RegisterCredentials {
-    acc: number;
-    cedula: number;
-    correo: string;
-    password: string;
-    password_confirmation: string;
-}

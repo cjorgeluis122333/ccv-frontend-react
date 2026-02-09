@@ -4,6 +4,7 @@ import {registerSchema} from '../schemas/authSchemas';
 import {authService} from '../services/authService';
 import {useNavigate} from 'react-router-dom';
 import type {z} from 'zod';
+import type {UserInfo} from "@/features/auth/types/userInfoType.ts";
 
 //The date write for the user before validate
 type RegisterFormInputs = z.input<typeof registerSchema>;
@@ -21,7 +22,14 @@ export const RegisterForm = () => {
             const parsedData: RegisterDTO = registerSchema.parse(data);
 
             const response = await authService.register(parsedData);
-            authService.setSession(response.access_token);
+// Tomamos los datos de 'response.socio_info' que es donde está la info completa
+            const userToSave: UserInfo = {
+                action: response.member_details.acc,       // Mapeamos 'acc' a 'action'
+                email: response.member_details.correo,     // Mapeamos 'correo' a 'email'
+                name: response.member_details.nombre,      // Mapeamos 'nombre' a 'name'
+                occupation: response.member_details.ocupacion // Mapeamos 'ocupacion' a 'occupation'
+            };
+            authService.setSession(response.access_token, userToSave);
             alert(response.message);
             navigate('/dashboard');
         } catch (error: unknown) {

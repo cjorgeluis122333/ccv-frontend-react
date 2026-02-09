@@ -1,24 +1,34 @@
 import api from '@/lib/axios';
-import type {LoginCredentials, LoginResponse, RegisterCredentials, RegisterResponse} from "../types";
+import type {UserInfo} from "@/features/auth/types/userInfoType.ts";
+import type {LoginCredentials, LoginResponse} from "@/features/auth/types/loginTypes.ts";
+import type {RegisterCredentials, RegisterResponse} from "@/features/auth/types/registerTypes.ts";
 
 
 export const authService = {
     login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
-        const { data } = await api.post<LoginResponse>('/login', credentials);
+        const {data} = await api.post<LoginResponse>('/login', credentials);
         return data;
     },
 
     register: async (credentials: RegisterCredentials): Promise<RegisterResponse> => {
-        const { data } = await api.post<RegisterResponse>('/register', credentials);
+        const {data} = await api.post<RegisterResponse>('/register', credentials);
         return data;
     },
 
-    // Método útil para guardar la sesión
-    setSession: (token: string) => {
+    setSession: (token: string, user: UserInfo) => {
         localStorage.setItem('token', token);
-        // Aquí podrías configurar headers globales si fuera necesario
+        localStorage.setItem('user', JSON.stringify(user)); // Guardamos el objeto como string
     },
-
+    getUser: (): UserInfo | null => {
+        const userStr = localStorage.getItem('user');
+        if (!userStr) return null;
+        try {
+            return JSON.parse(userStr);
+        } catch (error) {
+            console.error("Error al leer usuario del storage", error);
+            return null;
+        }
+    },
     logout: async () => {
         try {
             // 1. Intentamos invalidar el token en el servidor

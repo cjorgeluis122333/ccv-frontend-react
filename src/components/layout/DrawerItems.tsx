@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import type {NavItem, NavSection} from '@/config/navigation';
+import type {NavItem, NavSection} from "@/types/navigationTypes.ts";
 
 export const DrawerLink = ({ item, onClick }: { item: NavItem; onClick?: () => void }) => {
     return (
