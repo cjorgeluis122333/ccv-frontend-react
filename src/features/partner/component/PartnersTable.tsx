@@ -37,9 +37,9 @@ export const PartnersTable = ({ data, isLoading }: PartnersTableProps) => {
                             <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider text-[11px] w-24">Acción</th>
                             <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider text-[11px]">Nombre Completo</th>
                             <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider text-[11px]">Cédula</th>
+                            <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider text-[11px] text-center">Edad</th>
                             <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider text-[11px]">Teléfono</th>
                             <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider text-[11px]">Correo</th>
-                            <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider text-[11px] text-center">Edad</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50">
@@ -50,7 +50,7 @@ export const PartnersTable = ({ data, isLoading }: PartnersTableProps) => {
                             >
                                 <td className="px-6 py-4">
                                     <div className="inline-flex items-center px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 font-mono text-xs font-bold border border-blue-100">
-                                        #{partner.acc}
+                                        {partner.acc}
                                     </div>
                                 </td>
 
@@ -65,7 +65,11 @@ export const PartnersTable = ({ data, isLoading }: PartnersTableProps) => {
                                         {partner.cedula > 0 ? partner.cedula.toLocaleString() : 'N/A'}
                                     </div>
                                 </td>
-
+                                <td className="px-6 py-4 text-center">
+                                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-50 text-slate-700 font-bold text-xs border border-slate-100 group-hover:bg-blue-50 group-hover:text-blue-700 group-hover:border-blue-100 transition-all">
+                                        {calculateAge(partner.nacimiento)}
+                                    </span>
+                                </td>
                                 <td className="px-6 py-4">
                                     {partner.telefono && partner.telefono !== 'NO' ? (
                                         <div className="flex items-center gap-2 text-slate-600 text-xs">
@@ -88,11 +92,7 @@ export const PartnersTable = ({ data, isLoading }: PartnersTableProps) => {
                                     )}
                                 </td>
 
-                                <td className="px-6 py-4 text-center">
-                                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-50 text-slate-700 font-bold text-xs border border-slate-100 group-hover:bg-blue-50 group-hover:text-blue-700 group-hover:border-blue-100 transition-all">
-                                        {calculateAge(partner.nacimiento)}
-                                    </span>
-                                </td>
+
                             </tr>
                         ))}
                     </tbody>
