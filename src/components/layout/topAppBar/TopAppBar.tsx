@@ -3,12 +3,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '@/features/auth/services/authService';
 import {LogoutModal} from "@/components/ui/modal/LogoutModal.tsx";
+//
+// interface TopBarProps {
+//     onMenuClick: () => void;
+// }
 
-interface TopBarProps {
-    onMenuClick: () => void;
-}
-
-export const TopBar = ({ onMenuClick }: TopBarProps) => {
+export const TopBar = () => {
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -35,12 +35,6 @@ export const TopBar = ({ onMenuClick }: TopBarProps) => {
 
                 {/* Izquierda: Título y Toggle Menu (Móvil) */}
                 <div className="flex items-center gap-4">
-                    <button
-                        onClick={onMenuClick}
-                        className="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-50 transition-all active:scale-95"
-                    >
-                        <span className="material-symbols-rounded text-2xl">menu</span>
-                    </button>
                     <h1 className="text-lg font-black text-slate-800 tracking-tight hidden sm:block">
                         CCV Dash
                     </h1>
@@ -48,14 +42,6 @@ export const TopBar = ({ onMenuClick }: TopBarProps) => {
 
                 {/* Derecha: Acciones y Perfil */}
                 <div className="flex items-center gap-4">
-                    {/* Botón de Notificaciones (Ejemplo) */}
-                    <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors relative">
-                        <span className="material-symbols-rounded text-[22px]">notifications</span>
-                        <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-                    </button>
-
-                    <div className="h-8 w-[1px] bg-slate-100 mx-1 hidden sm:block"></div>
-
                     {/* Dropdown de Usuario */}
                     <div className="relative">
                         <button
