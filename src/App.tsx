@@ -1,12 +1,12 @@
-import { BrowserRouter } from 'react-router-dom';
+// import { BrowserRouter } from 'react-router-dom';
 import { AppRouter } from './router/AppRouter';
 
 function App() {
-    const basename = import.meta.env.BASE_URL;
+    // const basename = import.meta.env.BASE_URL;
     return (
-        <BrowserRouter basename={basename}>
+        // <BrowserRouter basename={basename}>
             <AppRouter />
-        </BrowserRouter>
+        // </BrowserRouter>
     );
 }
 

@@ -47,7 +47,7 @@ export const TopBar = () => {
                             <div className="relative flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-active:scale-95">
                                 {/* Ajustamos el tamaño a h-10 (40px) para que quepa bien en la barra */}
                                 <img
-                                    src="/logo/logo_CCVe.webp"
+                                    src={`${import.meta.env.BASE_URL}logo/logo_CCVe.webp`}
                                     alt="Logo CCV"
                                     className="h-10 w-auto object-contain drop-shadow-sm"
                                 />
