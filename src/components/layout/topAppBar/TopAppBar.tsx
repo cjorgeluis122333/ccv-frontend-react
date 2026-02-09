@@ -47,7 +47,7 @@ export const TopBar = () => {
                 {/* ... (Parte Izquierda igual) ... */}
                 <div className="flex items-center gap-4">
                     <h1 className="text-lg font-black text-slate-800 tracking-tight hidden sm:block">
-                        CCV Dash
+                        CCV
                     </h1>
                 </div>
 
