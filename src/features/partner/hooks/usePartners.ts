@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import type {PaginatedResponse} from "@/types/paginationResponseTypes.ts";
 import type {Partner} from "@/features/partner/types/partnerResponseType.ts";
 import {partnerService} from "@/features/partner/service/partnerService.ts";
@@ -8,6 +8,7 @@ export const usePartners = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [page, setPage] = useState(1);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const fetchPartners = useCallback(async () => {
         setIsLoading(true);
@@ -27,6 +28,20 @@ export const usePartners = () => {
         fetchPartners();
     }, [fetchPartners]);
 
+    // Filtrado local por búsqueda
+    const filteredPartners = useMemo(() => {
+        const partners = data?.data || [];
+        if (!searchTerm.trim()) return partners;
+        
+        const term = searchTerm.toLowerCase().trim();
+        return partners.filter(partner => 
+            partner.nombre.toLowerCase().includes(term) ||
+            partner.cedula.toString().includes(term) ||
+            (partner.correo && partner.correo.toLowerCase().includes(term)) ||
+            (partner.telefono && partner.telefono.includes(term))
+        );
+    }, [data?.data, searchTerm]);
+
     // Funciones para manejar la paginación
     const nextPage = () => {
         if (data && data.current_page < data.last_page) {
@@ -41,7 +56,8 @@ export const usePartners = () => {
     };
 
     return {
-        partners: data?.data || [],
+        partners: filteredPartners,
+        allPartners: data?.data || [],
         pagination: data ? {
             currentPage: data.current_page,
             lastPage: data.last_page,
@@ -54,6 +70,8 @@ export const usePartners = () => {
         nextPage,
         prevPage,
         setPage,
+        searchTerm,
+        setSearchTerm,
         refresh: fetchPartners
     };
 };
