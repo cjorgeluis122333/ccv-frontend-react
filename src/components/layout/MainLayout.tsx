@@ -1,9 +1,9 @@
 // src/components/layout/MainLayout.tsx
-import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
-import { cn } from "@/lib/utils.ts";
+import {useState} from 'react';
+import {Outlet} from 'react-router-dom';
+import {cn} from "@/lib/utils.ts";
 import {NavSidebar} from "@/components/layout/NavSidebar.tsx";
-import { TopBar } from './topAppBar/TopAppBar';
+import {TopBar} from './topAppBar/TopAppBar';
 
 export const MainLayout = () => {
     const [isExpanded, setIsExpanded] = useState(true);
@@ -11,7 +11,7 @@ export const MainLayout = () => {
     return (
         <div className="min-h-screen bg-[#fcfdfe] flex">
             {/* Sidebar */}
-            <NavSidebar isExpanded={isExpanded} onToggle={() => setIsExpanded(!isExpanded)} />
+            <NavSidebar isExpanded={isExpanded} onToggle={() => setIsExpanded(!isExpanded)}/>
 
             {/* Contenido Principal */}
             <div className={cn(
@@ -20,11 +20,11 @@ export const MainLayout = () => {
             )}>
 
                 {/* Nuevo TopBar (Pasamos la función de toggle para móvil si fuera necesario) */}
-                <TopBar onMenuClick={() => setIsExpanded(!isExpanded)} />
+                <TopBar/>
 
                 <main className="p-4 lg:p-8">
                     <div className="max-w-7xl mx-auto">
-                        <Outlet />
+                        <Outlet/>
                     </div>
                 </main>
             </div>
