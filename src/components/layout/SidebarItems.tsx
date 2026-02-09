@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import type { NavItem, NavSection } from '@/config/navigation'; // Asumiendo tus tipos
+import type {NavItem, NavSection} from "@/types/navigationTypes.ts";
 
 // --- SidebarLink (Items individuales) ---
 // No requiere cambios lógicos, ya cumple con "navegar pero no expandir"
@@ -45,34 +45,28 @@ interface SidebarGroupProps {
     isExpanded: boolean;
     onExpand: () => void; // <--- Nueva prop para forzar la apertura del sidebar
 }
-
 export const SidebarGroup = ({ section, isExpanded, onExpand }: SidebarGroupProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const location = useLocation();
 
-    // Lógica inteligente: Si el sidebar se colapsa externamente, cerramos el grupo.
-    // Pero si estamos en una ruta hija, mantenemos el grupo abierto al expandir.
-    useEffect(() => {
-        if (!isExpanded) {
-            setIsOpen(false);
-        } else {
-            // Opcional: Si quieres que al expandir manualmente el sidebar
-            // se abra el grupo donde está el usuario actualmente:
-            const hasActiveChild = section.items.some(item => location.pathname.startsWith(item.path));
-            if (hasActiveChild) setIsOpen(true);
-        }
-    }, [isExpanded, section.items, location.pathname]);
+    // 1. CALCULAMOS EL ESTADO EN TIEMPO DE RENDER (Estado derivado)
+    // Comprobamos si alguna ruta hija está activa
+    const hasActiveChild = section.items.some(item => location.pathname.startsWith(item.path));
+
+    // El grupo está REALMENTE abierto solo si el sidebar está expandido
+    // Y (el usuario lo abrió manualmente O tiene un hijo activo)
+    const isEffectiveOpen = isExpanded && (isOpen || hasActiveChild);
 
     const handleGroupClick = () => {
         if (!isExpanded) {
-            // CASO 1: Sidebar cerrado -> Expandir Sidebar y Abrir Grupo
+            // Si está colapsado, expandimos el sidebar y abrimos el grupo
             onExpand();
-            // Usamos un pequeño timeout para asegurar que la animación del sidebar
-            // inicie antes de desplegar los items, se ve más fluido.
-            setTimeout(() => setIsOpen(true), 150);
+            setIsOpen(true);
         } else {
-            // CASO 2: Sidebar abierto -> Toggle normal del acordeón
-            setIsOpen(!isOpen);
+            // Si ya está expandido, hacemos el toggle normal
+            // Si tenía un hijo activo y estaba "forzado" a estar abierto,
+            // al hacer clic ahora controlamos el estado manualmente
+            setIsOpen(!isEffectiveOpen);
         }
     };
 
@@ -82,7 +76,7 @@ export const SidebarGroup = ({ section, isExpanded, onExpand }: SidebarGroupProp
                 onClick={handleGroupClick}
                 className={cn(
                     "flex w-full items-center px-4 py-3 text-sm font-bold rounded-xl transition-all group relative",
-                    isOpen ? "text-blue-600 bg-blue-50/50" : "text-slate-700 hover:bg-slate-50",
+                    isEffectiveOpen ? "text-blue-600 bg-blue-50/50" : "text-slate-700 hover:bg-slate-50",
                     !isExpanded && "justify-center"
                 )}
             >
@@ -101,13 +95,12 @@ export const SidebarGroup = ({ section, isExpanded, onExpand }: SidebarGroupProp
                 {isExpanded && (
                     <span className={cn(
                         "material-symbols-rounded !text-[18px] ml-auto transition-transform duration-300",
-                        isOpen && "rotate-180"
+                        isEffectiveOpen && "rotate-180"
                     )}>
                         expand_more
                     </span>
                 )}
 
-                {/* Tooltip opcional para el grupo cuando está cerrado */}
                 {!isExpanded && (
                     <div className="absolute left-full ml-4 px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-[100] shadow-lg">
                         {section.title}
@@ -115,13 +108,13 @@ export const SidebarGroup = ({ section, isExpanded, onExpand }: SidebarGroupProp
                 )}
             </button>
 
-            {/* Sub-items */}
+            {/* Sub-items: Usamos isEffectiveOpen para controlar la visibilidad */}
             <div className={cn(
                 "grid transition-all duration-300 ease-in-out px-2 border-l-2 border-slate-100 ml-6",
-                isExpanded && isOpen ? "grid-rows-[1fr] opacity-100 mt-1" : "grid-rows-[0fr] opacity-0"
+                isEffectiveOpen ? "grid-rows-[1fr] opacity-100 mt-1" : "grid-rows-[0fr] opacity-0"
             )}>
                 <div className="overflow-hidden">
-                    {section.items.map((item) => (
+                    {section.items.map((item: NavItem) => (
                         <SidebarLink key={item.path} item={item} isExpanded={isExpanded} />
                     ))}
                 </div>
