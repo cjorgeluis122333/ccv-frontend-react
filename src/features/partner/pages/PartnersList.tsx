@@ -60,12 +60,7 @@ export const PartnersList = () => {
                             title="Recargar tabla"
                         >
                             <span className="material-symbols-rounded text-xl">refresh</span>
-                            <span className="lg:hidden">Actualizar</span>
-                        </button>
-                        
-                        <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all shadow-md shadow-blue-200 active:scale-95 font-semibold text-sm">
-                            <span className="material-symbols-rounded text-xl">person_add</span>
-                            <span>Nuevo Socio</span>
+                            <span>Actualizar</span>
                         </button>
                     </div>
                 </div>
