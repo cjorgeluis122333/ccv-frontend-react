@@ -16,7 +16,7 @@ export const PartnersList = () => {
     } = usePartners();
 
     return (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-[1600px] mx-auto">
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full">
 
             {/* Header de la Página */}
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
