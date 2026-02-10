@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://127.0.0.1:30000/api',
+    baseURL: 'https://ugliest-aleece-jorgeluis-d39b7ba0.koyeb.app/api',
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
