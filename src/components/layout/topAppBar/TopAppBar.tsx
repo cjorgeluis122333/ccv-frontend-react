@@ -32,10 +32,10 @@ export const TopBar = () => {
 
     return (
         <>
-            {/* Contenedor de la barra superior - Ocupa todo el ancho disponible */}
-            <div className="sticky top-0 z-30 w-full bg-white/80 backdrop-blur-xl border-b border-slate-200/60 h-16 flex items-center transition-all">
+            {/* Contenedor flotante - Restaurado al diseño original centrado */}
+            <div className="sticky top-4 z-30 w-full flex justify-center px-4 mb-6">
 
-                <header className="w-full flex items-center justify-between px-6">
+                <header className="w-full max-w-8xl bg-white/90 backdrop-blur-xl border border-slate-200/60 rounded-2xl shadow-sm h-16 flex items-center justify-between px-6 transition-all">
 
                     {/* --- IZQUIERDA: LOGO + EMPRESA --- */}
                     <div className="flex items-center">
