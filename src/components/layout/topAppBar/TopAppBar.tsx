@@ -32,20 +32,18 @@ export const TopBar = () => {
 
     return (
         <>
-            {/* Contenedor flotante */}
-            <div className="sticky top-4 z-30 w-full flex justify-center px-4 mb-6">
+            {/* Contenedor de la barra superior - Ocupa todo el ancho disponible */}
+            <div className="sticky top-0 z-30 w-full bg-white/80 backdrop-blur-xl border-b border-slate-200/60 h-16 flex items-center transition-all">
 
-                <header className="w-full max-w-8xl bg-white/90 backdrop-blur-xl border border-slate-200/60 rounded-2xl shadow-sm h-16 flex items-center justify-between px-6 transition-all">
+                <header className="w-full flex items-center justify-between px-6">
 
-                    {/* --- IZQUIERDA: LOGO + EMPRESA (NUEVO) --- */}
+                    {/* --- IZQUIERDA: LOGO + EMPRESA --- */}
                     <div className="flex items-center">
                         <Link
                             to="/dashboard"
                             className="flex items-center gap-3 group focus:outline-none"
                         >
-                            {/* Contenedor del Logo con Animación */}
                             <div className="relative flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-active:scale-95">
-                                {/* Ajustamos el tamaño a h-10 (40px) para que quepa bien en la barra */}
                                 <img
                                     src="logo/logo_CCVe.webp"
                                     alt="Logo CCV"
@@ -53,7 +51,6 @@ export const TopBar = () => {
                                 />
                             </div>
 
-                            {/* Texto de la Empresa (Visible en pantallas sm o mayores) */}
                             <div className="hidden sm:flex flex-col">
                                 <span className="text-lg font-black text-slate-800 tracking-tight leading-none group-hover:text-blue-600 transition-colors">
                                     CCV
@@ -65,7 +62,7 @@ export const TopBar = () => {
                         </Link>
                     </div>
 
-                    {/* --- DERECHA: PERFIL USUARIO (Igual que antes) --- */}
+                    {/* --- DERECHA: PERFIL USUARIO --- */}
                     <div className="flex items-center gap-4">
                         <div className="relative">
                             <button

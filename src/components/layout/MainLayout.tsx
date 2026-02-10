@@ -10,17 +10,22 @@ export const MainLayout = () => {
 
     return (
         <div className="min-h-screen w-full flex bg-[#fcfdfe]">
+            {/* Sidebar fijo a la izquierda */}
             <NavSidebar isExpanded={isExpanded} onToggle={() => setIsExpanded(!isExpanded)}/>
 
+            {/* Contenedor principal que se desplaza según el sidebar */}
             <div className={cn(
                 "flex-1 flex flex-col min-w-0 transition-all duration-300",
-                isExpanded ? "ml-[280px]" : "ml-[80px]"
+                isExpanded ? "lg:ml-[280px]" : "lg:ml-[80px]"
             )}>
-                <TopBar />
-                <main className="p-4 lg:p-8">
-                    {/* Aquí el max-w-7xl sí está bien porque centra el contenido de la tabla,
-                        pero la TopBar arriba seguirá siendo de ancho completo */}
-                    <div className="max-w-7xl mx-auto w-full">
+                {/* TopBar independiente del contenido, siempre arriba */}
+                <div className="w-full">
+                    <TopBar />
+                </div>
+
+                {/* Área de contenido con padding consistente */}
+                <main className="flex-1 p-4 sm:p-6 lg:p-8">
+                    <div className="max-w-7xl mx-auto w-full h-full">
                         <Outlet />
                     </div>
                 </main>
