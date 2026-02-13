@@ -33,7 +33,7 @@ export const menuSections: NavSection[] = [
             {
                 title: "Ventas",
                 path: "/ventas",
-                icon: "shopping_cart",
+                icon: "payments",
                 description: "Registro de ventas diarias",
                 color: "text-cyan-600 bg-cyan-50"
             }
