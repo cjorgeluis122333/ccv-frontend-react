@@ -5,9 +5,10 @@ import { SidebarGroup, SidebarLink } from './SidebarItems';
 interface NavSidebarProps {
     isExpanded: boolean;
     onToggle: () => void;
+    className?: string;
 }
 
-export const NavSidebar = ({ isExpanded, onToggle }: NavSidebarProps) => {
+export const NavSidebar = ({ isExpanded, onToggle, className }: NavSidebarProps) => {
 
     // Función auxiliar: Solo llama a toggle si está cerrado.
     const handleForceExpand = () => {
@@ -20,7 +21,8 @@ export const NavSidebar = ({ isExpanded, onToggle }: NavSidebarProps) => {
         <aside
             className={cn(
                 "fixed top-0 left-0 z-50 h-full bg-white border-r border-slate-100 transition-all duration-300 ease-in-out flex flex-col overflow-hidden",
-                isExpanded ? "w-[280px]" : "w-[80px]"
+                isExpanded ? "w-[280px]" : "w-[80px]",
+                className
             )}
         >
             {/* Header / Toggle */}

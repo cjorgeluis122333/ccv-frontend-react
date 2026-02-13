@@ -3,6 +3,10 @@ import { useNavigate, Link } from 'react-router-dom'; // <--- Importamos Link
 import { authService } from '@/features/auth/services/authService';
 import { LogoutModal } from "@/components/ui/modal/LogoutModal.tsx";
 import { useAuthUser } from '@/hooks/useAuthUser';
+//
+// interface TopBarProps {
+//     onMenuClick?: () => void;
+// }
 
 export const TopBar = () => {
     const navigate = useNavigate();
@@ -38,7 +42,15 @@ export const TopBar = () => {
                 <header className="w-full max-w-8xl bg-white/90 backdrop-blur-xl border border-slate-200/60 rounded-2xl shadow-sm h-16 flex items-center justify-between px-6 transition-all">
 
                     {/* --- IZQUIERDA: LOGO + EMPRESA --- */}
-                    <div className="flex items-center">
+                    <div className="flex items-center gap-3">
+                        {/* Botón hamburguesa - solo visible en < lg */}
+                        {/*<button*/}
+                        {/*    onClick={onMenuClick}*/}
+                        {/*    className="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-50 transition-all active:scale-95"*/}
+                        {/*>*/}
+                        {/*    <span className="material-symbols-rounded text-2xl">menu</span>*/}
+                        {/*</button>*/}
+
                         <Link
                             to="/dashboard"
                             className="flex items-center gap-3 group focus:outline-none"
