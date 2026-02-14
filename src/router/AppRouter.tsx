@@ -38,7 +38,7 @@ export const AppRouter = () => {
             </Route>
 
             {/* Redirección por defecto */}
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
     );
 };
