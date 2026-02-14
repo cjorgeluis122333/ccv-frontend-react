@@ -32,7 +32,7 @@ export const MainLayout = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // 2. SOLUCIÓN TÉCNICA: Cerrar al Navegar usando requestAnimationFrame
+    // 2. Cerrar al Navegar usando requestAnimationFrame
     useEffect(() => {
         if (isMobile && isExpanded) {
             // "Engañamos" a React difiriendo la actualización un frame
@@ -43,7 +43,7 @@ export const MainLayout = () => {
             // Limpieza esencial
             return () => cancelAnimationFrame(rafId);
         }
-    }, [pathname]); // Quitamos isExpanded de dependencias para evitar loops, confiamos en el check interno
+    }, [pathname]);
 
     // 3. Cerrar al hacer Clic Fuera (Mantenemos esta lógica como respaldo del Overlay)
     useEffect(() => {
