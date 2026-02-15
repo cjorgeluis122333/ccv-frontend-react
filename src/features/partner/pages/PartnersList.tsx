@@ -76,6 +76,7 @@ export const PartnersList = () => {
 
             {/* Contenedor Principal de Datos */}
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+
                 <PartnersTable data={partners} isLoading={isLoading} />
 
                 {/* Paginación */}

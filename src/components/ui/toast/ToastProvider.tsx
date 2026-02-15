@@ -1,5 +1,5 @@
 import React, { useState, useCallback, type ReactNode } from 'react';
-import { Toast } from './Toast';
+import { Toast } from '@/components/ui/toast/Toast.tsx';
 import {ToastContext, type ToastMessage, type ToastType} from "@/contexts/ToastContext.tsx";
 
 export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
