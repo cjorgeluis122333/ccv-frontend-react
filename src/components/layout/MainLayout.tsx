@@ -69,7 +69,6 @@ export const MainLayout = () => {
     return (
         <div className="min-h-screen w-full flex bg-[#fcfdfe] relative">
 
-            {/* --- NUEVO: OVERLAY PARA MÓVIL --- */}
             {/* Solo se muestra si es móvil y el menú está abierto */}
             <div
                 className={cn(
@@ -80,8 +79,7 @@ export const MainLayout = () => {
                 aria-hidden="true"
             />
 
-            {/* Sidebar Container */}
-            {/* Añadimos 'fixed' en móvil para que flote sobre el contenido */}
+            {/* NavSidebar Container */}
             <div
                 ref={sidebarRef}
                 className={cn(
