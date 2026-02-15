@@ -118,7 +118,7 @@ export const PartnersTable = ({ data, isLoading }: PartnersTableProps) => {
                     >
                         <div className="flex justify-between items-start gap-2">
                             <div className="flex items-center gap-3 overflow-hidden">
-                                <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 text-white flex items-center justify-center font-black text-sm shadow-sm shadow-blue-200">
+                                <div className="hidden min-[400px]:flex flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 text-white items-center justify-center font-black text-sm shadow-sm shadow-blue-200">
                                     {partner.nombre.substring(0, 2).toUpperCase()}
                                 </div>
                                 <div className="overflow-hidden">
