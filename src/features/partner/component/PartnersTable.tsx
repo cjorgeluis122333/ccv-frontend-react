@@ -40,8 +40,7 @@ export const PartnersTable = ({ data, isLoading }: PartnersTableProps) => {
                             <th className="px-6 py-5 font-bold text-slate-500 uppercase tracking-widest text-[10px] border-b border-slate-100">Socio</th>
                             <th className="px-6 py-5 font-bold text-slate-500 uppercase tracking-widest text-[10px] border-b border-slate-100">Identificación</th>
                             <th className="px-6 py-5 font-bold text-slate-500 uppercase tracking-widest text-[10px] border-b border-slate-100">Contacto</th>
-                            <th className="px-6 py-5 font-bold text-slate-500 uppercase tracking-widest text-[10px] border-b border-slate-100">Edad</th>
-                            <th className="px-6 py-5 font-bold text-slate-500 uppercase tracking-widest text-[10px] border-b border-slate-100 text-right">Estado</th>
+                            <th className="px-6 py-5 font-bold text-slate-500 uppercase tracking-widest text-[10px] border-b border-slate-100 text-right">Edad</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50">
@@ -96,19 +95,12 @@ export const PartnersTable = ({ data, isLoading }: PartnersTableProps) => {
                                     </div>
                                 </td>
 
-                                <td className="px-6 py-4">
-                                    <div className="flex items-center gap-2">
+                                <td className="px-6 py-4 text-right">
+                                    <div className="inline-flex items-center gap-2 justify-end">
                                         <span className="text-lg font-black text-slate-800 group-hover:text-blue-600 transition-colors">
                                             {calculateAge(partner.nacimiento)}
                                         </span>
                                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">años</span>
-                                    </div>
-                                </td>
-
-                                <td className="px-6 py-4 text-right">
-                                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-50 text-green-600 border border-green-100">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                                        <span className="text-[10px] font-bold uppercase tracking-wider">Verificado</span>
                                     </div>
                                 </td>
                             </tr>
