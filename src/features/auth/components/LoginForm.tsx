@@ -1,7 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {Link, useNavigate} from 'react-router-dom';
-import { useState } from 'react';
 import { useToast } from '@/contexts/ToastContext';
 import { loginSchema } from '../schemas/authSchemas';
 import { authService } from '../services/authService';
@@ -12,17 +11,17 @@ import type {UserInfo} from "@/features/auth/types/userInfoType.ts";
 
 // Inferimos el tipo TypeScript automáticamente desde Zod
 type LoginFormInputs = z.infer<typeof loginSchema>;
+
 export const LoginForm = () => {
     const navigate = useNavigate();
     const { showToast } = useToast();
-    const [serverError, setServerError] = useState<string | null>(null);
 
+    // Validation for field with ZOD
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
         resolver: zodResolver(loginSchema)
     });
 
     const onSubmit = async (data: LoginFormInputs) => {
-        setServerError(null);
         try {
             // 1. Hacemos la petición
             const response = await authService.login(data);
@@ -40,7 +39,6 @@ export const LoginForm = () => {
             navigate('/dashboard');
         } catch  {
             const errorMsg = "Credenciales inválidas o error de conexión";
-            setServerError(errorMsg);
             showToast(errorMsg, 'error');
         }
     };
@@ -57,11 +55,6 @@ export const LoginForm = () => {
                     <p className="text-slate-500 text-sm">Ingresa tus credenciales para acceder</p>
                 </div>
 
-                {serverError && (
-                    <div className="mb-6 p-3 rounded-xl bg-red-50 border border-red-100 text-red-600 text-xs font-semibold text-center animate-shake">
-                        {serverError}
-                    </div>
-                )}
 
                 {/* Formulario */}
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -80,11 +73,6 @@ export const LoginForm = () => {
                         {...register("password")}
                     />
 
-                    {/*<div className="flex justify-end">*/}
-                    {/*    <button type="button" className="text-xs font-bold text-blue-600 hover:text-blue-700 ">*/}
-                    {/*        ¿Olvidaste tu contraseña?*/}
-                    {/*    </button>*/}
-                    {/*</div>*/}
 
                     <Button type="submit" isLoading={isSubmitting}>
                         Iniciar Sesión

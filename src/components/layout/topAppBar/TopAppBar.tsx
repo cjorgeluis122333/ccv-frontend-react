@@ -3,10 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'; // <--- Importamos Link
 import { authService } from '@/features/auth/services/authService';
 import { LogoutModal } from "@/components/ui/modal/LogoutModal.tsx";
 import { useAuthUser } from '@/hooks/useAuthUser';
-//
-// interface TopBarProps {
-//     onMenuClick?: () => void;
-// }
+
 
 export const TopBar = () => {
     const navigate = useNavigate();
