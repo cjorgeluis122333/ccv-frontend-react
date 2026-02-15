@@ -1,6 +1,6 @@
+import type { ToastType } from '@/contexts/ToastContext';
 import React, { useEffect, useState } from 'react';
 import { CheckCircle, AlertCircle, Info, AlertTriangle, X } from 'lucide-react';
-import { ToastType } from '@/contexts/ToastContext';
 
 interface ToastProps {
   message: string;
