@@ -29,3 +29,13 @@ z.coerce.number().parse("abc");   // → NaN ❌
 
 
 https://cjorgeluis122333.github.io/ccv-frontend-react/dashboard
+
+
+
+src/features/auth/
+├── api/             # Servicios de Axios específicos de Auth
+├── components/      # Componentes exclusivos de Auth (LoginForm, RegisterCard)
+├── hooks/           # Lógica reutilizable solo en Auth (useAuth, useSession)
+├── types/           # Interfaces de TypeScript de este dominio
+├── utils/           # Helpers específicos
+└── index.ts         # El "Public API" del feature

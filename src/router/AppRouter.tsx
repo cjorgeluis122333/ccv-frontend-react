@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { LoginForm } from '@/features/auth/components/LoginForm';
-import { RegisterForm } from '@/features/auth/components/RegisterForm';
+import { LoginScreen } from '@/features/auth/LoginScreen.tsx';
+import { RegisterScreen } from '@/features/auth/RegisterScreen.tsx';
 import { MainLayout } from '@/components/layout/MainLayout';
 import {Dashboard} from "@/features/dashboard/component/DashboardScreen.tsx";
 import { PartnersList } from '@/features/partner/pages/PartnersList';
@@ -9,8 +9,8 @@ export const AppRouter = () => {
     return (
         <Routes>
             {/* Rutas Públicas */}
-            <Route path="/login" element={<LoginForm />} />
-            <Route path="/register" element={<RegisterForm />} />
+            <Route path="/login" element={<LoginScreen />} />
+            <Route path="/register" element={<RegisterScreen />} />
 
             {/* Rutas Protegidas (Layout con Drawer) */}
             <Route element={<MainLayout />}>
