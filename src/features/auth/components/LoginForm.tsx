@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {Link, useNavigate} from 'react-router-dom';
 import { useState } from 'react';
+import { useToast } from '@/contexts/ToastContext';
 import { loginSchema } from '../schemas/authSchemas';
 import { authService } from '../services/authService';
 import {Input} from "@/components/Input.tsx";
@@ -13,6 +14,7 @@ import type {UserInfo} from "@/features/auth/types/userInfoType.ts";
 type LoginFormInputs = z.infer<typeof loginSchema>;
 export const LoginForm = () => {
     const navigate = useNavigate();
+    const { showToast } = useToast();
     const [serverError, setServerError] = useState<string | null>(null);
 
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
@@ -34,10 +36,12 @@ export const LoginForm = () => {
 
             // 3. Guardamos en sesión el token y el objeto YA convertido
             authService.setSession(response.access_token, userToSave); // Aquí podrías guardar el 'response.user' en un Global Store (Context/Zustand)
-            console.log("Bienvenido:", response.socio_info.nombre);
+            showToast(`¡Bienvenido de nuevo, ${response.socio_info.nombre}!`, 'success');
             navigate('/dashboard');
         } catch  {
-            setServerError("Credenciales inválidas o error de conexión\"");
+            const errorMsg = "Credenciales inválidas o error de conexión";
+            setServerError(errorMsg);
+            showToast(errorMsg, 'error');
         }
     };
 

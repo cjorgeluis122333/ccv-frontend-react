@@ -3,6 +3,7 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import {registerSchema} from '../schemas/authSchemas';
 import {authService} from '../services/authService';
 import {useNavigate} from 'react-router-dom';
+import { useToast } from '@/contexts/ToastContext';
 import type {z} from 'zod';
 import type {UserInfo} from "@/features/auth/types/userInfoType.ts";
 
@@ -12,6 +13,7 @@ type RegisterFormInputs = z.input<typeof registerSchema>;
 type RegisterDTO = z.output<typeof registerSchema>;
 export const RegisterForm = () => {
     const navigate = useNavigate();
+    const { showToast } = useToast();
 
     const {register, handleSubmit, formState: {errors, isSubmitting}} = useForm<RegisterFormInputs>({
         resolver: zodResolver(registerSchema)
@@ -30,13 +32,13 @@ export const RegisterForm = () => {
                 occupation: response.member_details.ocupacion // Mapeamos 'ocupacion' a 'occupation'
             };
             authService.setSession(response.access_token, userToSave);
-            alert(response.message);
+            showToast(response.message || "¡Registro exitoso!", 'success');
             navigate('/dashboard');
         } catch (error: unknown) {
             if (error instanceof Error) {
-                alert(error.message);
+                showToast(error.message, 'error');
             } else {
-                alert("Error en el registro. Verifica los datos.");
+                showToast("Error en el registro. Verifica los datos.", 'error');
             }
         }
     };
