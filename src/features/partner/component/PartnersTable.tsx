@@ -1,5 +1,6 @@
 import type { Partner } from "@/features/partner/types/partnerResponseType.ts";
 import { calculateAge } from "@/utils/Date.ts";
+import { LoadingOverlay } from "@/components/ui/Loader/LoadingOverlay";
 
 interface PartnersTableProps {
     data: Partner[];
@@ -7,11 +8,10 @@ interface PartnersTableProps {
 }
 
 export const PartnersTable = ({ data, isLoading }: PartnersTableProps) => {
-    if (isLoading) {
+    if (isLoading && data.length === 0) {
         return (
-            <div className="w-full p-24 flex flex-col items-center justify-center gap-4 text-slate-400">
-                <span className="material-symbols-rounded animate-spin text-5xl text-blue-500">progress_activity</span>
-                <p className="text-sm font-medium animate-pulse">Cargando socios...</p>
+            <div className="w-full h-[400px] relative">
+                <LoadingOverlay message="Cargando directorio de socios..." />
             </div>
         );
     }
@@ -28,71 +28,89 @@ export const PartnersTable = ({ data, isLoading }: PartnersTableProps) => {
     }
 
     return (
-        <div className="w-full">
-            {/* Vista de Escritorio (Tabla) - Visible en lg y superiores para asegurar espacio */}
+        <div className="w-full relative min-h-[400px]">
+            {isLoading && <LoadingOverlay transparent message="Actualizando directorio..." />}
+            
+            {/* Vista de Escritorio (Tabla) - Optimizada para ≥1024px */}
             <div className="hidden lg:block overflow-x-auto">
-                <table className="w-full text-left text-sm border-collapse">
+                <table className="w-full text-left text-sm border-separate border-spacing-0">
                     <thead>
-                        <tr className="bg-slate-50/80 border-b border-slate-100">
-                            <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider text-[11px] w-24">Acción</th>
-                            <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider text-[11px]">Nombre Completo</th>
-                            <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider text-[11px]">Cédula</th>
-                            <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider text-[11px] text-center">Edad</th>
-                            <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider text-[11px]">Teléfono</th>
-                            <th className="px-6 py-4 font-bold text-slate-600 uppercase tracking-wider text-[11px]">Correo</th>
+                        <tr className="bg-slate-50/50">
+                            <th className="px-6 py-5 font-bold text-slate-500 uppercase tracking-widest text-[10px] border-b border-slate-100">Acción</th>
+                            <th className="px-6 py-5 font-bold text-slate-500 uppercase tracking-widest text-[10px] border-b border-slate-100">Socio</th>
+                            <th className="px-6 py-5 font-bold text-slate-500 uppercase tracking-widest text-[10px] border-b border-slate-100">Identificación</th>
+                            <th className="px-6 py-5 font-bold text-slate-500 uppercase tracking-widest text-[10px] border-b border-slate-100">Contacto</th>
+                            <th className="px-6 py-5 font-bold text-slate-500 uppercase tracking-widest text-[10px] border-b border-slate-100">Edad</th>
+                            <th className="px-6 py-5 font-bold text-slate-500 uppercase tracking-widest text-[10px] border-b border-slate-100 text-right">Estado</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50">
                         {data.map((partner, index) => (
                             <tr
                                 key={`partner-${partner.acc}-${partner.cedula}-${index}`}
-                                className="hover:bg-blue-50/30 transition-all group"
+                                className="hover:bg-slate-50/80 transition-all group cursor-default"
                             >
                                 <td className="px-6 py-4">
-                                    <div className="inline-flex items-center px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 font-mono text-xs font-bold border border-blue-100">
-                                        {partner.acc}
+                                    <div className="inline-flex items-center px-3 py-1.5 rounded-xl bg-white text-blue-600 font-black text-xs border border-slate-200 shadow-sm group-hover:border-blue-200 group-hover:bg-blue-50 transition-all">
+                                        #{partner.acc}
                                     </div>
                                 </td>
 
                                 <td className="px-6 py-4">
-                                    <div className="font-bold text-slate-800 group-hover:text-blue-700 transition-colors">
-                                        {partner.nombre}
-                                    </div>
-                                </td>
-
-                                <td className="px-6 py-4">
-                                    <div className="text-slate-600 font-mono text-xs">
-                                        {partner.cedula > 0 ? partner.cedula.toLocaleString() : 'N/A'}
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4 text-center">
-                                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-50 text-slate-700 font-bold text-xs border border-slate-100 group-hover:bg-blue-50 group-hover:text-blue-700 group-hover:border-blue-100 transition-all">
-                                        {calculateAge(partner.nacimiento)}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4">
-                                    {partner.telefono && partner.telefono !== 'NO' ? (
-                                        <div className="flex items-center gap-2 text-slate-600 text-xs">
-                                            <span className="material-symbols-rounded text-[16px] text-slate-400">call</span>
-                                            {partner.telefono}
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs border border-white shadow-sm group-hover:from-blue-500 group-hover:to-blue-600 group-hover:text-white transition-all duration-300">
+                                            {partner.nombre.substring(0, 2).toUpperCase()}
                                         </div>
-                                    ) : (
-                                        <span className="text-slate-300 italic text-[10px]">N/A</span>
-                                    )}
+                                        <div className="flex flex-col">
+                                            <span className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors leading-tight">
+                                                {partner.nombre}
+                                            </span>
+                                            <span className="text-[11px] text-slate-400 font-medium">Socio Activo</span>
+                                        </div>
+                                    </div>
                                 </td>
 
                                 <td className="px-6 py-4">
-                                    {partner.correo && partner.correo !== '@' ? (
-                                        <div className="flex items-center gap-2 text-slate-500 text-xs">
-                                            <span className="material-symbols-rounded text-[16px] text-slate-400">mail</span>
-                                            {partner.correo}
-                                        </div>
-                                    ) : (
-                                        <span className="text-slate-300 italic text-[10px]">Sin correo</span>
-                                    )}
+                                    <div className="flex flex-col gap-1">
+                                        <span className="text-slate-700 font-bold text-xs">Cédula</span>
+                                        <span className="text-slate-500 font-mono text-[11px]">
+                                            {partner.cedula > 0 ? partner.cedula.toLocaleString() : 'N/A'}
+                                        </span>
+                                    </div>
                                 </td>
 
+                                <td className="px-6 py-4">
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex items-center gap-2 text-slate-600">
+                                            <div className="w-5 h-5 rounded bg-slate-100 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                                                <span className="material-symbols-rounded text-[14px] text-slate-400 group-hover:text-blue-600">call</span>
+                                            </div>
+                                            <span className="text-[11px] font-medium">{partner.telefono !== 'NO' ? partner.telefono : 'N/A'}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-slate-600">
+                                            <div className="w-5 h-5 rounded bg-slate-100 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                                                <span className="material-symbols-rounded text-[14px] text-slate-400 group-hover:text-blue-600">mail</span>
+                                            </div>
+                                            <span className="text-[11px] font-medium truncate max-w-[150px]">{partner.correo !== '@' ? partner.correo : 'N/A'}</span>
+                                        </div>
+                                    </div>
+                                </td>
 
+                                <td className="px-6 py-4">
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-lg font-black text-slate-800 group-hover:text-blue-600 transition-colors">
+                                            {calculateAge(partner.nacimiento)}
+                                        </span>
+                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">años</span>
+                                    </div>
+                                </td>
+
+                                <td className="px-6 py-4 text-right">
+                                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-50 text-green-600 border border-green-100">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                                        <span className="text-[10px] font-bold uppercase tracking-wider">Verificado</span>
+                                    </div>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
