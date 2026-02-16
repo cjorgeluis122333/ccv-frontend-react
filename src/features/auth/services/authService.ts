@@ -1,16 +1,16 @@
 import api from '@/lib/axios';
 import type {UserInfo} from "@/features/auth/types/userInfoType.ts";
-import type {LoginCredentials, LoginResponse} from "@/features/auth/types/loginTypes.ts";
-import type {RegisterCredentials, RegisterResponse} from "@/features/auth/types/registerTypes.ts";
+import type { LoginRequest, LoginResponse} from "@/features/auth/types/loginTypes.ts";
+import type {RegisterRequest, RegisterResponse} from "@/features/auth/types/registerTypes.ts";
 
 
 export const authService = {
-    login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
+    login: async (credentials: LoginRequest): Promise<LoginResponse> => {
         const {data} = await api.post<LoginResponse>('/login', credentials);
         return data;
     },
 
-    register: async (credentials: RegisterCredentials): Promise<RegisterResponse> => {
+    register: async (credentials: RegisterRequest): Promise<RegisterResponse> => {
         const {data} = await api.post<RegisterResponse>('/register', credentials);
         return data;
     },
@@ -29,18 +29,5 @@ export const authService = {
             return null;
         }
     },
-    logout: async () => {
-        try {
-            // 1. Intentamos invalidar el token en el servidor
-            await api.post('/logout');
-        } catch (error) {
-            // Opcional: Manejar error si el servidor falla,
-            // pero usualmente queremos cerrar sesión localmente de todos modos.
-            console.error("Error al cerrar sesión en servidor", error);
-        } finally {
-            // 2. Limpiamos el token local (Store/LocalStorage)
-            localStorage.removeItem('token');
-            localStorage.removeItem('user'); // Si guardas datos del usuario
-        }
-    }
+
 };

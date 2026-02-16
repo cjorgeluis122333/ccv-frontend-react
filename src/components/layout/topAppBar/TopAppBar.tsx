@@ -1,34 +1,25 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom'; // <--- Importamos Link
-import { authService } from '@/features/auth/services/authService';
 import { LogoutModal } from "@/components/ui/modal/LogoutModal.tsx";
 import { useAuthUser } from '@/hooks/useAuthUser';
+import {useLogout} from "@/hooks/useLogout.ts";
 
 
 export const TopBar = () => {
     const navigate = useNavigate();
     const user = useAuthUser();
-
+    const { logout, isLoggingOut } = useLogout();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
-    const [isLoggingOut, setIsLoggingOut] = useState(false);
 
     const getInitials = (name: string | undefined) => {
         if (!name || !name.trim()) return "US";
         return name.trim().split(/\s+/).map(n => n[0]).slice(0, 2).join('').toUpperCase();
     };
 
-    const handleLogout = async () => {
-        setIsLoggingOut(true);
-        try {
-            await authService.logout();
-            navigate('/login');
-        } catch {
-            navigate('/login');
-        } finally {
-            setIsLoggingOut(false);
-            setShowLogoutModal(false);
-        }
+    const handleConfirmLogout = async () => {
+        await logout();
+        setShowLogoutModal(false);
     };
 
     return (
@@ -40,13 +31,6 @@ export const TopBar = () => {
 
                     {/* --- IZQUIERDA: LOGO + EMPRESA --- */}
                     <div className="flex items-center gap-3">
-                        {/* Botón hamburguesa - solo visible en < lg */}
-                        {/*<button*/}
-                        {/*    onClick={onMenuClick}*/}
-                        {/*    className="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-50 transition-all active:scale-95"*/}
-                        {/*>*/}
-                        {/*    <span className="material-symbols-rounded text-2xl">menu</span>*/}
-                        {/*</button>*/}
 
                         <Link
                             to="/dashboard"
@@ -54,7 +38,7 @@ export const TopBar = () => {
                         >
                             <div className="relative flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-active:scale-95">
                                 <img
-                                    src="logo/logo_CCVe.webp"
+                                    src={"logo/logo_CCVe.webp"}
                                     alt="Logo CCV"
                                     className="h-10 w-auto object-contain drop-shadow-sm"
                                 />
@@ -134,7 +118,7 @@ export const TopBar = () => {
             <LogoutModal
                 isOpen={showLogoutModal}
                 onClose={() => setShowLogoutModal(false)}
-                onConfirm={handleLogout}
+                onConfirm={handleConfirmLogout}
                 isLoading={isLoggingOut}
             />
         </>

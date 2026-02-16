@@ -11,7 +11,7 @@ export interface LoginResponse {
 }
 
 // Tipos para los formularios (Inputs)
-export interface LoginCredentials {
+export interface LoginRequest {
     acc: string; // Lo manejamos como string en el input, aunque se envíe número
     password: string;
 }

@@ -1,17 +1,18 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/contexts/ToastContext';
-import { authService } from '../services/authService';
-import type { RegisterFormValues } from '../schemas/registerSchemas.ts';
+import {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {useToast} from '@/contexts/ToastContext';
+import {authService} from '../services/authService';
+import type {RegisterFormValues} from '../schemas/registerSchemas.ts';
 import {authAdapter} from "@/features/auth/adapter/authAdapter.ts";
 
 export const useRegister = () => {
     const navigate = useNavigate();
-    const { showToast } = useToast();
+    const {showToast} = useToast();
     const [isLoading, setIsLoading] = useState(false);
     const [serverError, setServerError] = useState<string | null>(null);
 
     const registerUser = async (data: RegisterFormValues) => {
+        if (isLoading) return;
         setIsLoading(true);
         setServerError(null);
 
@@ -40,5 +41,5 @@ export const useRegister = () => {
         }
     };
 
-    return { registerUser, isLoading, serverError };
+    return {registerUser, isLoading, serverError};
 };

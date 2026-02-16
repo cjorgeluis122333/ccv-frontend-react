@@ -12,6 +12,7 @@ export const useLogin = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const login = async (data: LoginFormValues) => {
+        if (isLoading) return;
         setIsLoading(true);
 
         try {

@@ -11,7 +11,7 @@ export interface RegisterResponse {
 }
 
 
-export interface RegisterCredentials {
+export interface RegisterRequest {
     acc: number;
     cedula: number;
     correo: string;
