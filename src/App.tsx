@@ -1,5 +1,5 @@
 // import { BrowserRouter } from 'react-router-dom';
-import { ToastProvider } from './components/ui/Toast/ToastProvider';
+import { ToastProvider } from '@/components/ui/toast/ToastProvider.tsx';
 import { AppRouter } from './router/AppRouter';
 
 function App() {
