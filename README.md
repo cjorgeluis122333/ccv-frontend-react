@@ -1,3 +1,7 @@
+## TODO
+1. El componente modal de cerrar section y mostrar el nombre y correo tiene 
+que minimizarse al pulsar fuera de él
+2. Check the request of list partner for see if you can make better
 ## Validation
 
 Para formularios robustos en React, el estándar de la industria hoy en día es:
