@@ -1,19 +1,21 @@
-import {useForm} from 'react-hook-form';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {Link} from 'react-router-dom';
-import {Input} from "@/components/Input";
-import {Button} from "@/components/Button";
-import {type LoginFormValues, loginSchema} from './schemas/loginSchema.ts';
-import {useLogin} from './hooks/useLogin';
-import {AuthLayout} from './components/layout/AuthLayout.tsx';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Link } from 'react-router-dom';
+import { Input } from "@/components/Input";
+import { Button } from "@/components/Button";
+import { type LoginFormValues, loginSchema } from './schemas/loginSchema.ts';
+import { useLogin } from './hooks/useLogin';
+import { AuthLayout } from './components/layout/AuthLayout.tsx';
+import { useState } from 'react';
+
 
 export const LoginScreen = () => {
     // 1. Hook de lógica de negocio
-    const {login, isLoading} = useLogin();
+    const { login, isLoading } = useLogin();
 
     // 2. Configuración de React Hook Form con Zod
-    const {register, handleSubmit, formState: {errors}} = useForm<LoginFormValues>(
-        {resolver: zodResolver(loginSchema)}
+    const { register, handleSubmit, formState: { errors } } = useForm<LoginFormValues>(
+        { resolver: zodResolver(loginSchema) }
     );
 
     return (
