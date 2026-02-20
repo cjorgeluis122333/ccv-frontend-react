@@ -6,7 +6,6 @@ import { Button } from "@/components/Button";
 import { type LoginFormValues, loginSchema } from './schemas/loginSchema.ts';
 import { useLogin } from './hooks/useLogin';
 import { AuthLayout } from './components/layout/AuthLayout.tsx';
-import { useState } from 'react';
 
 
 export const LoginScreen = () => {
