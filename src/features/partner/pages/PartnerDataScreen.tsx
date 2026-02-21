@@ -13,7 +13,7 @@ export const PartnerDataScreen = () => {
 
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // Cerrar dropdown al hacer click fuera
+    // Cerrar dropdown al hacer click fuera de él
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {

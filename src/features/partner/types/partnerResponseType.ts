@@ -18,3 +18,21 @@ export interface PartnerQueryParams {
     page?: number;
     per_page?: number;
 }
+
+export interface FamilyMember {
+    ind: number;
+    acc: number;
+    nombre: string;
+    cedula: number;
+    carnet: string;
+    celular: string;
+    nacimiento: string;
+    direccion: string;
+    categoria: string;
+}
+
+export interface FamilyResponse {
+    status: string;
+    message: string | null;
+    data: FamilyMember[];
+}
