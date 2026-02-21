@@ -1,11 +1,16 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { usePartners } from '../hooks/usePartners';
 import type { Partner } from '../types/partnerResponseType';
+import { partnerService } from '../service/partnerService';
 
 export const PartnerDataScreen = () => {
-    const { partners, searchTerm, setSearchTerm, isLoading } = usePartners();
+    const { partners, searchTerm, setSearchTerm, isLoading, refresh } = usePartners();
     const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [formData, setFormData] = useState<Partial<Partner>>({});
+    const [isSaving, setIsSaving] = useState(false);
+    const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     // Cerrar dropdown al hacer click fuera
@@ -19,18 +24,70 @@ export const PartnerDataScreen = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    // Limpiar alertas después de 3 segundos
+    useEffect(() => {
+        if (saveStatus) {
+            const timer = setTimeout(() => setSaveStatus(null), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [saveStatus]);
+
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
         setIsDropdownOpen(true);
         if (!e.target.value) {
             setSelectedPartner(null);
+            setFormData({});
+            setSaveStatus(null);
         }
     };
 
     const handleSelectPartner = (partner: Partner) => {
         setSelectedPartner(partner);
+        setFormData(partner); // Inicializar form data
         setSearchTerm(partner.nombre);
         setIsDropdownOpen(false);
+        setSaveStatus(null);
+    };
+
+    const handleInputChange = (field: keyof Partner, value: string) => {
+        setFormData(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
+    const hasChanges = useMemo(() => {
+        if (!selectedPartner) return false;
+        // Comparamos los campos actuales con los originales
+        return Object.keys(formData).some((key) => {
+            const k = key as keyof Partner;
+            // Manejamos null vs undefined vs empty string
+            const formVal = formData[k] || '';
+            const originalVal = selectedPartner[k] || '';
+            return formVal !== originalVal;
+        });
+    }, [formData, selectedPartner]);
+
+    const handleSave = async () => {
+        if (!selectedPartner || !hasChanges) return;
+
+        setIsSaving(true);
+        setSaveStatus(null);
+
+        try {
+            const updatedPartner = await partnerService.update(selectedPartner.acc, formData);
+            setSelectedPartner(updatedPartner);
+            setFormData(updatedPartner);
+            setSaveStatus({ type: 'success', message: 'Datos actualizados correctamente' });
+            // Opcional: refrescar la lista global para que el buscador se actualice
+            refresh();
+        } catch (error) {
+            console.error(error);
+            setSaveStatus({ type: 'error', message: 'Error al actualizar los datos del socio' });
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (
@@ -45,10 +102,38 @@ export const PartnerDataScreen = () => {
                         <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                             Datos del Socio
                         </h1>
-                        <p className="text-slate-500 text-sm font-medium">Búsqueda y consulta de información de socios.</p>
+                        <p className="text-slate-500 text-sm font-medium">Búsqueda y edición de información de socios.</p>
                     </div>
                 </div>
+                {/* Botón Guardar (movido al header para mejor acceso) */}
+                <button
+                    onClick={handleSave}
+                    disabled={!hasChanges || isSaving || !selectedPartner}
+                    className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm shadow-sm transition-all
+                        ${!selectedPartner || !hasChanges
+                            ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                            : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-md active:scale-95'}`}
+                >
+                    {isSaving ? (
+                        <span className="material-symbols-rounded text-xl animate-spin">progress_activity</span>
+                    ) : (
+                        <span className="material-symbols-rounded text-xl">save</span>
+                    )}
+                    <span>{isSaving ? 'Guardando...' : 'Guardar Cambios'}</span>
+                </button>
             </div>
+
+            {/* Alertas de Estado */}
+            {saveStatus && (
+                <div className={`p-4 rounded-xl text-sm font-medium border flex items-center gap-3 animate-in slide-in-from-top-2
+                    ${saveStatus.type === 'success' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-red-50 text-red-600 border-red-100'}`}
+                >
+                    <span className="material-symbols-rounded">
+                        {saveStatus.type === 'success' ? 'check_circle' : 'error'}
+                    </span>
+                    {saveStatus.message}
+                </div>
+            )}
 
             {/* Búsqueda */}
             <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm relative" ref={dropdownRef}>
@@ -106,11 +191,17 @@ export const PartnerDataScreen = () => {
 
             {/* Formulario de Datos */}
             <div className={`bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden transition-all duration-500 ${selectedPartner ? 'opacity-100 translate-y-0' : 'opacity-50 pointer-events-none grayscale-[0.2]'}`}>
-                <div className="p-6 border-b border-slate-100 bg-slate-50/80">
+                <div className="p-6 border-b border-slate-100 bg-slate-50/80 flex justify-between items-center">
                     <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
                         <span className="material-symbols-rounded text-indigo-500">person_book</span>
                         Información del Titular
                     </h2>
+                    {hasChanges && (
+                        <span className="text-xs font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200 flex items-center gap-1">
+                            <span className="material-symbols-rounded text-[14px]">edit</span>
+                            Cambios sin guardar
+                        </span>
+                    )}
                 </div>
 
                 <div className="p-6 sm:p-8">
@@ -119,7 +210,7 @@ export const PartnerDataScreen = () => {
                             <div className="w-20 h-20 mx-auto bg-slate-50 rounded-full flex items-center justify-center mb-4">
                                 <span className="material-symbols-rounded text-4xl text-slate-300">search</span>
                             </div>
-                            <p className="font-medium">Seleccione un socio en el buscador<br />para visualizar sus datos</p>
+                            <p className="font-medium">Seleccione un socio en el buscador<br />para visualizar y editar sus datos</p>
                         </div>
                     )}
 
@@ -136,29 +227,40 @@ export const PartnerDataScreen = () => {
                             </span>
                         </div>
 
-                        {/* Campos del formulario */}
+                        {/* Campos del formulario editables */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5">
-                            <Field label="Acción (Acc)" value={selectedPartner?.acc} icon="tag" />
-                            <Field label="Cédula" value={selectedPartner?.cedula} icon="badge" />
-                            <Field label="Carnet" value={selectedPartner?.carnet || 'N/A'} icon="id_card" />
-
-                            <div className="sm:col-span-2 lg:col-span-3">
-                                <Field label="Nombre Completo" value={selectedPartner?.nombre} icon="person" />
+                            {/* Acc no es editable */}
+                            <div className="space-y-1.5 group">
+                                <label className="text-[11px] font-bold text-slate-400 flex items-center gap-1.5 uppercase tracking-wider">
+                                    <span className="material-symbols-rounded text-[1.2em]">tag</span>
+                                    Acción (Acc)
+                                </label>
+                                <div className="px-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-slate-500 font-semibold text-sm min-h-[46px] flex items-center shadow-inner select-none cursor-not-allowed">
+                                    {formData.acc}
+                                </div>
                             </div>
 
-                            <Field label="Celular" value={selectedPartner?.celular || 'N/A'} icon="phone_iphone" />
-                            <Field label="Teléfono" value={selectedPartner?.telefono || 'N/A'} icon="call" />
-                            <Field label="Correo Electrónico" value={selectedPartner?.correo || 'N/A'} icon="mail" />
+                            <InputField label="Cédula" field="cedula" value={formData.cedula} onChange={handleInputChange} icon="badge" type="number" />
+                            <InputField label="Carnet" field="carnet" value={formData.carnet} onChange={handleInputChange} icon="id_card" />
 
                             <div className="sm:col-span-2 lg:col-span-3">
-                                <Field label="Dirección" value={selectedPartner?.direccion || 'N/A'} icon="location_on" />
+                                <InputField label="Nombre Completo" field="nombre" value={formData.nombre} onChange={handleInputChange} icon="person" />
                             </div>
 
-                            <Field label="Fecha Nacimiento" value={selectedPartner?.nacimiento} icon="cake" />
-                            <Field label="Fecha Ingreso" value={selectedPartner?.ingreso || 'N/A'} icon="calendar_month" />
-                            <Field label="Ocupación" value={selectedPartner?.ocupacion || 'N/A'} icon="work" />
+                            <InputField label="Celular" field="celular" value={formData.celular} onChange={handleInputChange} icon="phone_iphone" />
+                            <InputField label="Teléfono" field="telefono" value={formData.telefono} onChange={handleInputChange} icon="call" />
+                            <InputField label="Correo Electrónico" field="correo" value={formData.correo} onChange={handleInputChange} icon="mail" type="email" />
 
-                            <Field label="Cobrador" value={selectedPartner?.cobrador || 'N/A'} icon="account_balance_wallet" />
+                            <div className="sm:col-span-2 lg:col-span-3">
+                                <InputField label="Dirección" field="direccion" value={formData.direccion} onChange={handleInputChange} icon="location_on" />
+                            </div>
+
+                            <InputField label="Fecha Nacimiento" field="nacimiento" value={formData.nacimiento} onChange={handleInputChange} icon="cake" type="date" />
+                            <InputField label="Fecha Ingreso" field="ingreso" value={formData.ingreso} onChange={handleInputChange} icon="calendar_month" type="date" />
+                            <InputField label="Ocupación" field="ocupacion" value={formData.ocupacion} onChange={handleInputChange} icon="work" />
+
+                            {/* Categoría Ocultada */}
+                            <InputField label="Cobrador" field="cobrador" value={formData.cobrador} onChange={handleInputChange} icon="account_balance_wallet" />
                         </div>
                     </div>
                 </div>
@@ -167,14 +269,32 @@ export const PartnerDataScreen = () => {
     );
 };
 
-const Field = ({ label, value, icon }: { label: string; value: string | number | undefined; icon: string }) => (
-    <div className="space-y-1.5 group">
-        <label className="text-[11px] font-bold text-slate-400 group-hover:text-blue-500 transition-colors uppercase tracking-wider flex items-center gap-1.5">
-            <span className="material-symbols-rounded text-[1.2em]">{icon}</span>
-            {label}
-        </label>
-        <div className="px-4 py-3 bg-slate-50/80 border border-slate-200/80 rounded-xl text-slate-800 font-semibold text-sm min-h-[46px] flex items-center shadow-sm group-hover:border-blue-200 group-hover:bg-blue-50/30 transition-all truncate">
-            {value}
+interface InputFieldProps {
+    label: string;
+    field: keyof Partner;
+    value: string | number | null | undefined;
+    onChange: (field: keyof Partner, value: string) => void;
+    icon: string;
+    type?: string;
+}
+
+const InputField = ({ label, field, value, onChange, icon, type = "text" }: InputFieldProps) => {
+    // Manejar null o undefined
+    const displayValue = value === null || value === undefined ? '' : value.toString();
+
+    return (
+        <div className="space-y-1.5 group">
+            <label className="text-[11px] font-bold text-slate-400 group-focus-within:text-indigo-600 transition-colors uppercase tracking-wider flex items-center gap-1.5 hover:cursor-text">
+                <span className="material-symbols-rounded text-[1.2em]">{icon}</span>
+                {label}
+            </label>
+            <input
+                type={type}
+                value={displayValue}
+                onChange={(e) => onChange(field, e.target.value)}
+                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 font-semibold text-sm h-[46px] shadow-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 hover:border-slate-300 transition-all placeholder:text-slate-300 placeholder:font-normal"
+                placeholder={`Ingrese ${label.toLowerCase()}`}
+            />
         </div>
-    </div>
-);
+    );
+};
