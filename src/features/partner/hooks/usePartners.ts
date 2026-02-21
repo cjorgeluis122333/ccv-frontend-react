@@ -14,7 +14,7 @@ export const usePartners = () => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await partnerService.getAll({ page, per_page: 50 });
+            const response = await partnerService.getAll({ page, per_page: -1 });
             setData(response);
         } catch (err) {
             console.error(err);

@@ -1,5 +1,5 @@
 import api from '@/lib/axios';
-import type { Partner, PartnerQueryParams } from "@/features/partner/types/partnerResponseType.ts";
+import type { FamilyResponse, Partner, PartnerQueryParams } from "@/features/partner/types/partnerResponseType.ts";
 import type { PaginatedResponse } from "@/types/paginationResponseTypes.ts";
 
 export const partnerService = {
@@ -13,5 +13,9 @@ export const partnerService = {
     update: async (acc: number, partnerData: Partial<Partner>): Promise<Partner> => {
         const { data } = await api.put<{ message: string; partner: Partner }>(`/partners/${acc}`, partnerData);
         return data.partner;
+    },
+    getFamily: async (acc: number): Promise<FamilyResponse> => {
+        const { data } = await api.get<FamilyResponse>(`/family/${acc}`);
+        return data;
     }
 };
