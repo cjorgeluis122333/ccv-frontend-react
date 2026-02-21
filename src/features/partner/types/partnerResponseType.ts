@@ -29,6 +29,11 @@ export interface FamilyMember {
     nacimiento: string;
     direccion: string;
     categoria: string;
+    telefono?: string;
+    correo?: string;
+    ingreso?: string;
+    ocupacion?: string;
+    cobrador?: number;
 }
 
 export interface FamilyResponse {
