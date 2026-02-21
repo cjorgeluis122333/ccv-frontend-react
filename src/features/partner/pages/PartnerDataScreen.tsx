@@ -109,7 +109,7 @@ export const PartnerDataScreen = () => {
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-5xl mx-auto pb-12">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm sticky top-4 z-20">
+            <div className="flex flex-col justify-between items-start gap-6 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm relative z-20">
                 <div className="flex items-center gap-4">
                     <div className="p-3 bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-2xl shadow-lg shadow-indigo-100">
                         <span className="material-symbols-rounded text-2xl block">badge</span>
@@ -121,21 +121,6 @@ export const PartnerDataScreen = () => {
                         <p className="text-slate-500 text-sm font-medium">Búsqueda y edición de información de socios y familiares.</p>
                     </div>
                 </div>
-                <button
-                    onClick={handleSave}
-                    disabled={!hasChanges || isSaving || !selectedPartner}
-                    className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm shadow-sm transition-all
-                        ${!selectedPartner || !hasChanges
-                            ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                            : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-md active:scale-95'}`}
-                >
-                    {isSaving ? (
-                        <span className="material-symbols-rounded text-xl animate-spin">progress_activity</span>
-                    ) : (
-                        <span className="material-symbols-rounded text-xl">save</span>
-                    )}
-                    <span>{isSaving ? 'Guardando...' : 'Guardar Cambios'}</span>
-                </button>
             </div>
 
             {saveStatus && (
@@ -201,7 +186,7 @@ export const PartnerDataScreen = () => {
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-500">
 
                     {/* Tarjeta del Titular */}
-                    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col">
                         <div className="p-6 border-b border-slate-100 bg-slate-50/80 flex justify-between items-center">
                             <h2 className="text-lg font-black text-slate-800 flex items-center gap-2">
                                 <span className="material-symbols-rounded text-indigo-500">person</span>
@@ -215,7 +200,7 @@ export const PartnerDataScreen = () => {
                             )}
                         </div>
 
-                        <div className="p-6 sm:p-8">
+                        <div className="p-6 sm:p-8 flex-1">
                             <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] lg:grid-cols-[250px_1fr] gap-8 lg:gap-12">
                                 <div className="flex flex-col items-center space-y-4">
                                     <div className="w-full aspect-square max-w-[220px] rounded-3xl bg-slate-50 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center overflow-hidden relative group">
@@ -260,6 +245,25 @@ export const PartnerDataScreen = () => {
                                     <InputField label="Cobrador" field="cobrador" value={formData.cobrador} onChange={handleInputChange} icon="account_balance_wallet" />
                                 </div>
                             </div>
+                        </div>
+
+                        {/* Footer Titular con el Botón Guardar */}
+                        <div className="border-t border-slate-100 bg-slate-50/50 p-6 flex justify-end">
+                            <button
+                                onClick={handleSave}
+                                disabled={!hasChanges || isSaving || !selectedPartner}
+                                className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm shadow-sm transition-all
+                                    ${!selectedPartner || !hasChanges
+                                        ? 'bg-slate-200 text-slate-400 cursor-not-allowed hidden md:flex'
+                                        : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-md active:scale-95'}`}
+                            >
+                                {isSaving ? (
+                                    <span className="material-symbols-rounded text-xl animate-spin">progress_activity</span>
+                                ) : (
+                                    <span className="material-symbols-rounded text-xl">save</span>
+                                )}
+                                <span>{isSaving ? 'Guardando...' : 'Guardar Cambios del Titular'}</span>
+                            </button>
                         </div>
                     </div>
 
