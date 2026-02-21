@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import type {PaginatedResponse} from "@/types/paginationResponseTypes.ts";
-import type {Partner} from "@/features/partner/types/partnerResponseType.ts";
-import {partnerService} from "@/features/partner/service/partnerService.ts";
+import type { PaginatedResponse } from "@/types/paginationResponseTypes.ts";
+import type { Partner } from "@/features/partner/types/partnerResponseType.ts";
+import { partnerService } from "@/features/partner/service/partnerService.ts";
 
 export const usePartners = () => {
     const [data, setData] = useState<PaginatedResponse<Partner> | null>(null);
@@ -32,11 +32,12 @@ export const usePartners = () => {
     const filteredPartners = useMemo(() => {
         const partners = data?.data || [];
         if (!searchTerm.trim()) return partners;
-        
+
         const term = searchTerm.toLowerCase().trim();
-        return partners.filter(partner => 
+        return partners.filter(partner =>
             partner.nombre.toLowerCase().includes(term) ||
             partner.cedula.toString().includes(term) ||
+            partner.acc.toString().includes(term) ||
             (partner.correo && partner.correo.toLowerCase().includes(term)) ||
             (partner.telefono && partner.telefono.includes(term))
         );
