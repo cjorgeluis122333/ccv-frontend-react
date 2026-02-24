@@ -2,7 +2,8 @@ import axios from 'axios';
 
 const api = axios.create({
     // baseURL: 'https://ugliest-aleece-jorgeluis-d39b7ba0.koyeb.app/api',
-    baseURL: 'http://localhost:8000/api',//'https://css-server-1.onrender.com/api',
+    // baseURL: 'http://localhost:8000/api',
+    baseURL: 'https://css-server-1.onrender.com/api',
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
