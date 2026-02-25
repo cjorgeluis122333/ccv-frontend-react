@@ -7,7 +7,7 @@ import {FamilyMemberCard} from "@/features/partner/component/FamilyMemberCard.ts
 import {InputSearch} from "@/components/input/InputSearch.tsx";
 import {useSearchGeneric} from "@/hooks/search/useSearchPartner.ts";
 import {useGenericFilter} from "@/hooks/search/useGenericFilter.ts";
-import {GenericInput} from "@/components/input/GenericImputField.tsx";
+import {InputField} from "@/components/input/InputField.tsx";
 
 
 export const PartnerDataScreen = () => {
@@ -192,37 +192,37 @@ export const PartnerDataScreen = () => {
                                     </div>
 
 
-                                    <GenericInput label="Cédula" field="cedula" value={formData.cedula || ''}
+                                    <InputField label="Cédula" field="cedula" value={formData.cedula || ''}
                                                 onChange={handleInputChange} icon="badge" type="number"/>
-                                    <GenericInput label="Carnet" field="carnet" value={formData.carnet || ''}
+                                    <InputField label="Carnet" field="carnet" value={formData.carnet || ''}
                                                 onChange={handleInputChange} icon="id_card"/>
 
                                     <div className="sm:col-span-2 lg:col-span-3">
-                                        <GenericInput label="Nombre Completo" field="nombre" value={formData.nombre || ''}
+                                        <InputField label="Nombre Completo" field="nombre" value={formData.nombre || ''}
                                                     onChange={handleInputChange} icon="person"/>
                                     </div>
 
-                                    <GenericInput label="Celular" field="celular" value={formData.celular || ''}
+                                    <InputField label="Celular" field="celular" value={formData.celular || ''}
                                                 onChange={handleInputChange} icon="phone_iphone"/>
-                                    <GenericInput label="Teléfono" field="telefono" value={formData.telefono || ''}
+                                    <InputField label="Teléfono" field="telefono" value={formData.telefono || ''}
                                                 onChange={handleInputChange} icon="call"/>
-                                    <GenericInput label="Correo Electrónico" field="correo" value={formData.correo || ''}
+                                    <InputField label="Correo Electrónico" field="correo" value={formData.correo || ''}
                                                 onChange={handleInputChange} icon="mail" type="email"/>
 
                                     <div className="sm:col-span-2 lg:col-span-3">
-                                        <GenericInput label="Dirección" field="direccion" value={formData.direccion || ''}
+                                        <InputField label="Dirección" field="direccion" value={formData.direccion || ''}
                                                     onChange={handleInputChange} icon="location_on"/>
                                     </div>
 
-                                    <GenericInput label="Fecha Nacimiento" field="nacimiento"
+                                    <InputField label="Fecha Nacimiento" field="nacimiento"
                                                 value={formData.nacimiento || ''} onChange={handleInputChange}
                                                 icon="cake" type="date"/>
-                                    <GenericInput label="Fecha Ingreso" field="ingreso" value={formData.ingreso || ''}
+                                    <InputField label="Fecha Ingreso" field="ingreso" value={formData.ingreso || ''}
                                                 onChange={handleInputChange} icon="calendar_month" type="date"/>
-                                    <GenericInput label="Ocupación" field="ocupacion" value={formData.ocupacion || ''}
+                                    <InputField label="Ocupación" field="ocupacion" value={formData.ocupacion || ''}
                                                 onChange={handleInputChange} icon="work"/>
 
-                                    <GenericInput label="Cobrador" field="cobrador" value={formData.cobrador || ''}
+                                    <InputField label="Cobrador" field="cobrador" value={formData.cobrador || ''}
                                                 onChange={handleInputChange} icon="account_balance_wallet"/>
                                 </div>
                             </div>

@@ -1,8 +1,8 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'react-router-dom';
-import { Input } from "@/components/Input";
-import { Button } from "@/components/Button";
+import { Input } from "@/components/input/Input";
+import { Button } from "@/components/button/Button";
 import { type LoginFormValues, loginSchema } from '../schemas/loginSchema.ts';
 import { useLogin } from '../hooks/useLogin';
 import { AuthLayout } from '../components/layout/AuthLayout.tsx';

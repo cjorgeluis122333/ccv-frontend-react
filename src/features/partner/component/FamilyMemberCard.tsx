@@ -3,7 +3,7 @@
 import type {FamilyMember} from "@/features/partner/types/partnerResponseType.ts";
 import {useEffect, useMemo, useState} from "react";
 import {partnerService} from "@/features/partner/service/partnerService.ts";
-import {GenericInput} from "@/components/input/GenericImputField.tsx";
+import {GenericInput} from "@/components/input/InputField.tsx";
 import {INPUT_THEMES} from "@/utils/inputTheme.ts";
 import {InputSelectedOption} from "@/components/input/InputSelectedOption.tsx";
 

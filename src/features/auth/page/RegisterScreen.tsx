@@ -1,10 +1,8 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'react-router-dom';
-
-// Componentes Reutilizables
-import { Input } from "@/components/Input";
-import { Button } from "@/components/Button";
+import { Input } from "@/components/input/Input";
+import { Button } from "@/components/button/Button";
 
 // Lógica y Esquemas
 import { useRegister } from '../hooks/useRegister';
