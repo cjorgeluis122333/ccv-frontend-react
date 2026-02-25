@@ -3,16 +3,16 @@ import {usePartners} from '../hooks/usePartners';
 import type {FamilyMember, Partner} from '../types/partnerResponseType';
 import {partnerService} from '../service/partnerService';
 import {usePartnerForm} from "@/features/partner/hooks/usePartnerForm.ts";
-import {InputField} from '@/components/input/InputField';
 import {FamilyMemberCard} from "@/features/partner/component/FamilyMemberCard.tsx";
-import {GenericSearch} from "@/components/input/GenericSearch.tsx";
+import {InputSearch} from "@/components/input/InputSearch.tsx";
 import {useSearchGeneric} from "@/hooks/search/useSearchPartner.ts";
 import {useGenericFilter} from "@/hooks/search/useGenericFilter.ts";
+import {GenericInput} from "@/components/input/GenericImputField.tsx";
 
 
 export const PartnerDataScreen = () => {
     // 1. Estado Global y del Dominio
-    const {partners:allPartners, searchTerm, setSearchTerm, isLoading, refresh} = usePartners();
+    const {partners: allPartners, searchTerm, setSearchTerm, isLoading, refresh} = usePartners();
 
     // 2. Estado Local del Componente
     const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
@@ -32,7 +32,7 @@ export const PartnerDataScreen = () => {
     });
 
     // 4. Usamos el Hook Genérico de Filtrado
-    const { filteredItems, isFiltering } = useGenericFilter<Partner>({
+    const {filteredItems, isFiltering} = useGenericFilter<Partner>({
         items: allPartners,
         searchTerm: searchTerm,
         filterFn: (p, term) => {
@@ -109,7 +109,7 @@ export const PartnerDataScreen = () => {
             )}
 
             {/* Búsqueda */}
-            <GenericSearch<Partner>
+            <InputSearch<Partner>
                 label="Buscar Socio Titular"
                 placeholder="Buscar por nombre, cédula o número de acción..."
                 searchTerm={searchTerm}
@@ -191,37 +191,38 @@ export const PartnerDataScreen = () => {
                                         </div>
                                     </div>
 
-                                    <InputField label="Cédula" field="cedula" value={formData.cedula || ''}
+
+                                    <GenericInput label="Cédula" field="cedula" value={formData.cedula || ''}
                                                 onChange={handleInputChange} icon="badge" type="number"/>
-                                    <InputField label="Carnet" field="carnet" value={formData.carnet || ''}
+                                    <GenericInput label="Carnet" field="carnet" value={formData.carnet || ''}
                                                 onChange={handleInputChange} icon="id_card"/>
 
                                     <div className="sm:col-span-2 lg:col-span-3">
-                                        <InputField label="Nombre Completo" field="nombre" value={formData.nombre || ''}
+                                        <GenericInput label="Nombre Completo" field="nombre" value={formData.nombre || ''}
                                                     onChange={handleInputChange} icon="person"/>
                                     </div>
 
-                                    <InputField label="Celular" field="celular" value={formData.celular || ''}
+                                    <GenericInput label="Celular" field="celular" value={formData.celular || ''}
                                                 onChange={handleInputChange} icon="phone_iphone"/>
-                                    <InputField label="Teléfono" field="telefono" value={formData.telefono || ''}
+                                    <GenericInput label="Teléfono" field="telefono" value={formData.telefono || ''}
                                                 onChange={handleInputChange} icon="call"/>
-                                    <InputField label="Correo Electrónico" field="correo" value={formData.correo || ''}
+                                    <GenericInput label="Correo Electrónico" field="correo" value={formData.correo || ''}
                                                 onChange={handleInputChange} icon="mail" type="email"/>
 
                                     <div className="sm:col-span-2 lg:col-span-3">
-                                        <InputField label="Dirección" field="direccion" value={formData.direccion || ''}
+                                        <GenericInput label="Dirección" field="direccion" value={formData.direccion || ''}
                                                     onChange={handleInputChange} icon="location_on"/>
                                     </div>
 
-                                    <InputField label="Fecha Nacimiento" field="nacimiento"
+                                    <GenericInput label="Fecha Nacimiento" field="nacimiento"
                                                 value={formData.nacimiento || ''} onChange={handleInputChange}
                                                 icon="cake" type="date"/>
-                                    <InputField label="Fecha Ingreso" field="ingreso" value={formData.ingreso || ''}
+                                    <GenericInput label="Fecha Ingreso" field="ingreso" value={formData.ingreso || ''}
                                                 onChange={handleInputChange} icon="calendar_month" type="date"/>
-                                    <InputField label="Ocupación" field="ocupacion" value={formData.ocupacion || ''}
+                                    <GenericInput label="Ocupación" field="ocupacion" value={formData.ocupacion || ''}
                                                 onChange={handleInputChange} icon="work"/>
 
-                                    <InputField label="Cobrador" field="cobrador" value={formData.cobrador || ''}
+                                    <GenericInput label="Cobrador" field="cobrador" value={formData.cobrador || ''}
                                                 onChange={handleInputChange} icon="account_balance_wallet"/>
                                 </div>
                             </div>

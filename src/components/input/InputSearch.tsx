@@ -17,7 +17,7 @@ interface GenericSearchProps<T> {
     dropdownRef: RefObject<HTMLDivElement | null>;
 }
 
-export const GenericSearch = <T, >({
+export const InputSearch = <T, >({
                                        label,
                                        placeholder = "Buscar...",
                                        searchTerm,

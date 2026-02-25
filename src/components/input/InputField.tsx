@@ -1,7 +1,9 @@
 // Componente para inputs del Titular (Editable)
 import type {Partner} from "@/features/partner/types/partnerResponseType.ts";
 
-export const InputField = ({ label, field, value, onChange, icon, type = "text" }: {
+export const InputField = ({
+                               label, field, value, onChange, icon, type = "text"
+}: {
     label: string, field: keyof Partner, value: string | number | null | undefined,
     onChange: (f: keyof Partner, v: string) => void, icon: string, type?: string
 }) => {

@@ -3,8 +3,9 @@
 import type {FamilyMember} from "@/features/partner/types/partnerResponseType.ts";
 import {useEffect, useMemo, useState} from "react";
 import {partnerService} from "@/features/partner/service/partnerService.ts";
-import { FamilyInputField } from "./FamilyInputField";
-import {FamilySelectField} from "@/features/partner/component/FamilySelectedField.tsx";
+import {GenericInput} from "@/components/input/GenericImputField.tsx";
+import {INPUT_THEMES} from "@/utils/inputTheme.ts";
+import {InputSelectedOption} from "@/components/input/InputSelectedOption.tsx";
 
 export const FamilyMemberCard = ({ member, number }: { member: FamilyMember, number: number }) => {
     const [formData, setFormData] = useState<Partial<FamilyMember>>(member);
@@ -103,20 +104,21 @@ export const FamilyMemberCard = ({ member, number }: { member: FamilyMember, num
             {/* Formulario del familiar */}
             <div className="p-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-5 gap-y-4">
-                    <FamilyInputField label="Nombre Completo" field="nombre" value={formData.nombre} onChange={handleInputChange} icon="person" />
-                    <FamilyInputField label="Cédula" field="cedula" value={formData.cedula} onChange={handleInputChange} icon="badge" type="number" />
-                    <FamilyInputField label="Carnet" field="carnet" value={formData.carnet} onChange={handleInputChange} icon="id_card" />
-                    <FamilyInputField label="Celular" field="celular" value={formData.celular} onChange={handleInputChange} icon="smartphone" />
-                    <FamilySelectField
+                    <GenericInput label="Nombre Completo" field="nombre" value={formData.nombre} onChange={handleInputChange} icon="person" styles={INPUT_THEMES.fuchsia}/>
+                    <GenericInput label="Cédula" field="cedula" value={formData.cedula} onChange={handleInputChange} icon="badge" type="number"  styles={INPUT_THEMES.fuchsia}/>
+                    <GenericInput label="Carnet" field="carnet" value={formData.carnet} onChange={handleInputChange} icon="id_card"  styles={INPUT_THEMES.fuchsia}/>
+                    <GenericInput label="Celular" field="celular" value={formData.celular} onChange={handleInputChange} icon="smartphone"  styles={INPUT_THEMES.fuchsia}/>
+                    <InputSelectedOption<FamilyMember>
                         label="Teléfono"
                         field="telefono"
                         value={formData.telefono}
                         onChange={handleInputChange}
                         icon="call"
-                        options={[{ label: 'Sí', value: 'Si' }, { label: 'No', value: 'No' }]}
+                        options={[{ label: 'Sí', value: 'SI' }, { label: 'No', value: 'NO' }]}
+                        styles={INPUT_THEMES.fuchsia}
                     />
-                    <FamilyInputField label="Parentesco/Dirección" field="direccion" value={formData.direccion} onChange={handleInputChange} icon="family_restroom" />
-                    <FamilyInputField label="Nacimiento" field="nacimiento" value={formData.nacimiento} onChange={handleInputChange} icon="cake" type="date" />
+                    <GenericInput label="Parentesco/Dirección" field="direccion" value={formData.direccion} onChange={handleInputChange} icon="family_restroom"  styles={INPUT_THEMES.fuchsia}/>
+                    <GenericInput label="Nacimiento" field="nacimiento" value={formData.nacimiento} onChange={handleInputChange} icon="cake" type="date"  styles={INPUT_THEMES.fuchsia}/>
                 </div>
             </div>
         </div>

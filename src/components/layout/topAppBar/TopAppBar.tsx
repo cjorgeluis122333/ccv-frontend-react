@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom'; // <--- Importamos Link
 import { LogoutModal } from "@/components/ui/modal/LogoutModal.tsx";
-import { useAuthUser } from '@/hooks/useAuthUser';
-import {useLogout} from "@/hooks/useLogout.ts";
+import { useAuthUser } from '@/hooks/auth/useAuthUser';
+import {useLogout} from "@/hooks/auth/useLogout.ts";
 
 
 export const TopBar = () => {

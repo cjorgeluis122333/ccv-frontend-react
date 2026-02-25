@@ -1,5 +1,5 @@
 import type { Partner } from "@/features/partner/types/partnerResponseType.ts";
-import { calculateAge } from "@/utils/Date.ts";
+import { calculateAge } from "@/utils/date.ts";
 import { LoadingOverlay } from "@/components/ui/loader/LoadingOverlay";
 
 interface PartnersTableProps {
