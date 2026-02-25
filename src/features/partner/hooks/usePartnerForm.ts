@@ -3,22 +3,12 @@ import { useState, useMemo, useEffect } from 'react';
 import { partnerService } from '../service/partnerService';
 import type { Partner } from '../types/partnerResponseType';
 
-export const usePartnerForm = (
-    selectedPartner: Partner | null,
-    onUpdateSuccess: (updatedPartner: Partner) => void
-) => {
+export const usePartnerForm = (initialPartner: Partner | null, onSaveSuccess: (partner: Partner) => void) => {
     const [formData, setFormData] = useState<Partial<Partner>>({});
     const [isSaving, setIsSaving] = useState(false);
     const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
-    // Inicializar form data cuando cambia el socio
-    useEffect(() => {
-        if (selectedPartner) {
-            setFormData(selectedPartner);
-        }
-    }, [selectedPartner]);
-
-    // Limpiar alertas
+    // Autolimpiar alertas
     useEffect(() => {
         if (saveStatus) {
             const timer = setTimeout(() => setSaveStatus(null), 3000);
@@ -26,46 +16,40 @@ export const usePartnerForm = (
         }
     }, [saveStatus]);
 
+    // NUEVO: Función para forzar la sincronización inmediata
+    const resetForm = (partner: Partner | null) => {
+        setFormData(partner || {});
+        setSaveStatus(null);
+    };
+
     const handleInputChange = (field: keyof Partner, value: string) => {
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
     const hasChanges = useMemo(() => {
-        if (!selectedPartner) return false;
+        if (!initialPartner) return false;
         return Object.keys(formData).some((key) => {
             const k = key as keyof Partner;
-            const formVal = formData[k] || '';
-            const originalVal = selectedPartner[k] || '';
-            return formVal !== originalVal;
+            return (formData[k] || '') !== (initialPartner[k] || '');
         });
-    }, [formData, selectedPartner]);
+    }, [formData, initialPartner]);
 
-    const handleSave = async () => {
-        if (!selectedPartner || !hasChanges) return;
-
+    const handleSave = async () => { // Renombrado a handleSave para coincidir con tu UI
+        if (!initialPartner || !hasChanges) return;
         setIsSaving(true);
-        setSaveStatus(null);
-
         try {
-            const updatedPartner = await partnerService.update(selectedPartner.acc, formData);
-            setFormData(updatedPartner);
+            const updated = await partnerService.update(initialPartner.acc, formData);
             setSaveStatus({ type: 'success', message: 'Datos actualizados correctamente' });
-            onUpdateSuccess(updatedPartner); // Notificar al padre
+            onSaveSuccess(updated); // Pasamos el actualizado
+            return updated;
         } catch (error) {
-            console.error(error);
-            setSaveStatus({ type: 'error', message: 'Error al actualizar los datos del socio' });
+            setSaveStatus({ type: 'error', message: 'Error al actualizar los datos' });
+            throw error;
         } finally {
             setIsSaving(false);
         }
     };
 
-    return {
-        formData,
-        isSaving,
-        saveStatus,
-        hasChanges,
-        handleInputChange,
-        handleSave,
-        setSaveStatus // Exponemos esto por si el padre necesita limpiarlo al cambiar de socio
-    };
+    // Exportamos resetForm y setSaveStatus
+    return { formData, setFormData, handleInputChange, hasChanges, isSaving, saveStatus, handleSave, resetForm };
 };
