@@ -1,13 +1,14 @@
-import {useMemo, useState} from 'react';
+import {useState} from 'react';
 import {usePartners} from '../hooks/usePartners';
 import type {FamilyMember, Partner} from '../types/partnerResponseType';
 import {partnerService} from '../service/partnerService';
 import {usePartnerForm} from "@/features/partner/hooks/usePartnerForm.ts";
-import {useSearchPartner} from "@/features/partner/hooks/useSearchPartner.ts";
 import {InputField} from '@/components/input/InputField';
 import {FamilyMemberCard} from "@/features/partner/component/FamilyMemberCard.tsx";
 import {GenericSearch} from "@/components/input/GenericSearch.tsx";
-import {useDebounce} from "@/hooks/useDebounce.ts";
+import {useSearchGeneric} from "@/hooks/search/useSearchPartner.ts";
+import {useGenericFilter} from "@/hooks/search/useGenericFilter.ts";
+
 
 export const PartnerDataScreen = () => {
     // 1. Estado Global y del Dominio
@@ -18,18 +19,31 @@ export const PartnerDataScreen = () => {
     const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
     const [isLoadingFamily, setIsLoadingFamily] = useState(false);
 
-    // 3. Integración de Hooks Personalizados
+    // 3. Integración de Hooks para la búsqueda
     const {
         isDropdownOpen,
         setIsDropdownOpen,
         dropdownRef,
         handleSearchChange
-    } = useSearchPartner(setSearchTerm, () => {
+    } = useSearchGeneric(setSearchTerm, () => {
         // Callback: Qué hacer cuando se limpia el buscador
         setSelectedPartner(null);
         setFamilyMembers([]);
     });
 
+    // 4. Usamos el Hook Genérico de Filtrado
+    const { filteredItems, isFiltering } = useGenericFilter<Partner>({
+        items: allPartners,
+        searchTerm: searchTerm,
+        filterFn: (p, term) => {
+            const nombre = p.nombre?.toLowerCase() || "";
+            const acc = String(p.acc || "");
+            const cedula = String(p.cedula || "");
+            return nombre.includes(term) || acc.includes(term) || cedula.includes(term);
+        }
+    });
+
+    // Hook para manejar el formulario de los socios
     const {
         formData,
         isSaving,
@@ -43,34 +57,6 @@ export const PartnerDataScreen = () => {
         resetForm(updatedPartner); // Sincronizamos tras guardar
         refresh();
     });
-
-// --- NUEVA LÓGICA DE RENDIMIENTO ---
-
-    // 2. Debounce: Espera 400ms después de que el usuario deja de escribir
-    const debouncedSearchTerm = useDebounce(searchTerm, 400);
-
-    // 3. Bandera de Shimmer: Si el texto actual no coincide con el debounced, estamos "filtrando"
-    const isFiltering = searchTerm.trim() !== debouncedSearchTerm.trim();
-
-    // 4. Filtro Pesado: Solo se ejecuta cuando el debounce cambia
-    const filteredPartners = useMemo(() => {
-        const term = debouncedSearchTerm.toLowerCase().trim();
-        if (!term) return [];
-
-        return allPartners.filter(p => {
-            // 1. Convertimos todo a string y usamos "?" por si el dato viene vacío (null/undefined)
-            // Usamos String() para asegurar que incluso si es un número, funcione el .includes
-            const nombre = p.nombre?.toLowerCase() || "";
-            const acc = String(p.acc || "");
-            const cedula = String(p.cedula || "");
-
-            return nombre.includes(term) ||
-                acc.includes(term) ||
-                cedula.includes(term);
-        }).slice(0, 50);
-    }, [debouncedSearchTerm, allPartners]);
-    // --- FIN DE LÓGICA DE RENDIMIENTO ---
-
 
     // Select partner
     const handleSelectPartner = async (partner: Partner) => {
@@ -126,16 +112,16 @@ export const PartnerDataScreen = () => {
             <GenericSearch<Partner>
                 label="Buscar Socio Titular"
                 placeholder="Buscar por nombre, cédula o número de acción..."
-                searchTerm={searchTerm}           // Valor rápido para que el input no se trabe
+                searchTerm={searchTerm}
                 onSearchChange={handleSearchChange}
                 onFocus={() => setIsDropdownOpen(true)}
                 isLoading={isLoading}
-                isFiltering={isFiltering}           // <--- PASAMOS LA NUEVA PROP
+                isFiltering={isFiltering}
                 isDropdownOpen={isDropdownOpen}
-                items={filteredPartners}           // <--- PASAMOS LA LISTA FILTRADA LENTAMENTE
+                items={filteredItems} // <--- Viene del hook genérico
                 onSelectItem={handleSelectPartner}
                 dropdownRef={dropdownRef}
-                keyExtractor={(partner) => partner.acc}
+                keyExtractor={(p) => p.acc}
                 renderItem={(partner) => (
                     <>
                         <div className="font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">

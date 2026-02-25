@@ -1,7 +1,7 @@
 // hooks/useSearchPartner.ts
 import React, { useState, useRef, useEffect } from 'react';
 
-export const useSearchPartner = (
+export const useSearchGeneric = (
     setSearchTerm: (val: string) => void,
     onClearSearch: () => void
 ) => {
