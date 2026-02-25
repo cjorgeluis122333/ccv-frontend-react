@@ -3,9 +3,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'react-router-dom';
 import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
-import { type LoginFormValues, loginSchema } from './schemas/loginSchema.ts';
-import { useLogin } from './hooks/useLogin';
-import { AuthLayout } from './components/layout/AuthLayout.tsx';
+import { type LoginFormValues, loginSchema } from '../schemas/loginSchema.ts';
+import { useLogin } from '../hooks/useLogin';
+import { AuthLayout } from '../components/layout/AuthLayout.tsx';
 
 
 export const LoginScreen = () => {

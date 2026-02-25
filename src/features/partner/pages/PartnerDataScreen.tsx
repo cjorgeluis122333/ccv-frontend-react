@@ -1,60 +1,53 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import  { useState } from 'react';
 import { usePartners } from '../hooks/usePartners';
 import type { Partner, FamilyMember } from '../types/partnerResponseType';
 import { partnerService } from '../service/partnerService';
+import {usePartnerForm} from "@/features/partner/hooks/usePartnerForm.ts";
+import {useSearchPartner} from "@/features/partner/hooks/useSearchPartner.ts";
+import { InputField } from '@/components/input/InputField';
+import {FamilyMemberCard} from "@/features/partner/component/FamilyMemberCard.tsx";
 
 export const PartnerDataScreen = () => {
+    // 1. Estado Global y del Dominio
     const { partners, searchTerm, setSearchTerm, isLoading, refresh } = usePartners();
+
+    // 2. Estado Local del Componente
     const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-    // Titular State
-    const [formData, setFormData] = useState<Partial<Partner>>({});
-    const [isSaving, setIsSaving] = useState(false);
-    const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
-
-    // Family State
     const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
     const [isLoadingFamily, setIsLoadingFamily] = useState(false);
 
-    const dropdownRef = useRef<HTMLDivElement>(null);
+    // 3. Integración de Hooks Personalizados
+    const {
+        isDropdownOpen,
+        setIsDropdownOpen,
+        dropdownRef,
+        handleSearchChange
+    } = useSearchPartner(setSearchTerm, () => {
+        // Callback: Qué hacer cuando se limpia el buscador
+        setSelectedPartner(null);
+        setFamilyMembers([]);
+    });
 
-    // Cerrar dropdown al hacer click fuera de él
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setIsDropdownOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    const {
+        formData,
+        isSaving,
+        saveStatus,
+        hasChanges,
+        handleInputChange,
+        handleSave,
+        setSaveStatus
+    } = usePartnerForm(selectedPartner, (updatedPartner) => {
+        // Callback: Qué hacer cuando se guarda con éxito
+        setSelectedPartner(updatedPartner);
+        refresh();
+    });
 
-    // Limpiar alertas después de 3 segundos
-    useEffect(() => {
-        if (saveStatus) {
-            const timer = setTimeout(() => setSaveStatus(null), 3000);
-            return () => clearTimeout(timer);
-        }
-    }, [saveStatus]);
-
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(e.target.value);
-        setIsDropdownOpen(true);
-        if (!e.target.value) {
-            setSelectedPartner(null);
-            setFormData({});
-            setFamilyMembers([]);
-            setSaveStatus(null);
-        }
-    };
-
+    // 4. Lógica de Coordinación
     const handleSelectPartner = async (partner: Partner) => {
         setSelectedPartner(partner);
-        setFormData(partner); // Inicializar form data
         setSearchTerm(partner.nombre);
         setIsDropdownOpen(false);
-        setSaveStatus(null);
+        setSaveStatus(null); // Limpiar alertas del hook de formulario
 
         // Fetch Family Members
         setIsLoadingFamily(true);
@@ -68,44 +61,6 @@ export const PartnerDataScreen = () => {
             setIsLoadingFamily(false);
         }
     };
-
-    const handleInputChange = (field: keyof Partner, value: string) => {
-        setFormData(prev => ({
-            ...prev,
-            [field]: value
-        }));
-    };
-
-    const hasChanges = useMemo(() => {
-        if (!selectedPartner) return false;
-        return Object.keys(formData).some((key) => {
-            const k = key as keyof Partner;
-            const formVal = formData[k] || '';
-            const originalVal = selectedPartner[k] || '';
-            return formVal !== originalVal;
-        });
-    }, [formData, selectedPartner]);
-
-    const handleSave = async () => {
-        if (!selectedPartner || !hasChanges) return;
-
-        setIsSaving(true);
-        setSaveStatus(null);
-
-        try {
-            const updatedPartner = await partnerService.update(selectedPartner.acc, formData);
-            setSelectedPartner(updatedPartner);
-            setFormData(updatedPartner);
-            setSaveStatus({ type: 'success', message: 'Datos actualizados correctamente' });
-            refresh();
-        } catch (error) {
-            console.error(error);
-            setSaveStatus({ type: 'error', message: 'Error al actualizar los datos del socio' });
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-5xl mx-auto pb-12">
             {/* Header */}
@@ -321,197 +276,4 @@ export const PartnerDataScreen = () => {
     );
 };
 
-// Componente para inputs del Titular (Editable)
-const InputField = ({ label, field, value, onChange, icon, type = "text" }: {
-    label: string, field: keyof Partner, value: string | number | null | undefined,
-    onChange: (f: keyof Partner, v: string) => void, icon: string, type?: string
-}) => {
-    const displayValue = value === null || value === undefined ? '' : value.toString();
-    return (
-        <div className="space-y-1.5 group">
-            <label className="text-[11px] font-bold text-slate-400 group-focus-within:text-indigo-600 transition-colors uppercase tracking-wider flex items-center gap-1.5 hover:cursor-text">
-                <span className="material-symbols-rounded text-[1.2em]">{icon}</span>
-                {label}
-            </label>
-            <input
-                type={type}
-                value={displayValue}
-                onChange={(e) => onChange(field, e.target.value)}
-                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-800 font-semibold text-sm h-[46px] shadow-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 hover:border-slate-300 transition-all placeholder:text-slate-300 placeholder:font-normal"
-                placeholder={`Ingrese ${label.toLowerCase()}`}
-            />
-        </div>
-    );
-};
 
-// Tarjeta para Familiar (Editable)
-const FamilyMemberCard = ({ member, number }: { member: FamilyMember, number: number }) => {
-    const [formData, setFormData] = useState<Partial<FamilyMember>>(member);
-    const [isSaving, setIsSaving] = useState(false);
-    const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
-
-    // Sincronizar si cambia el miembro (por ej, al seleccionar otro titular diferente)
-    useEffect(() => {
-        setFormData(member);
-        setSaveStatus(null);
-    }, [member]);
-
-    // Limpiar alertas
-    useEffect(() => {
-        if (saveStatus) {
-            const timer = setTimeout(() => setSaveStatus(null), 3000);
-            return () => clearTimeout(timer);
-        }
-    }, [saveStatus]);
-
-    const handleInputChange = (field: keyof FamilyMember, value: string) => {
-        setFormData(prev => ({
-            ...prev,
-            [field]: value
-        }));
-    };
-
-    const hasChanges = useMemo(() => {
-        return Object.keys(formData).some((key) => {
-            const k = key as keyof FamilyMember;
-            const formVal = formData[k] === null || formData[k] === undefined ? '' : formData[k].toString();
-            const originalVal = member[k] === null || member[k] === undefined ? '' : member[k].toString();
-            return formVal !== originalVal;
-        });
-    }, [formData, member]);
-
-    const handleSave = async () => {
-        if (!hasChanges) return;
-        setIsSaving(true);
-        setSaveStatus(null);
-
-        try {
-            await partnerService.updateFamily(member.ind, formData);
-            setSaveStatus({ type: 'success', message: 'Familiar actualizado' });
-        } catch (error) {
-            console.error("Error al actualizar familiar:", error);
-            setSaveStatus({ type: 'error', message: 'Error de actualización' });
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    return (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:border-fuchsia-200 hover:shadow-md transition-all duration-300 group">
-            {/* Cabecera del familiar editable */}
-            <div className="px-5 py-3.5 border-b border-slate-100 bg-slate-50/50 flex flex-col xl:flex-row xl:items-center justify-between gap-4 group-hover:bg-fuchsia-50/30 transition-colors">
-                <div className="flex items-center gap-3">
-                    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-white border border-slate-200 text-xs font-black text-slate-500 shadow-sm">
-                        {number}
-                    </span>
-                    <h3 className="font-bold text-slate-800 text-base">{formData.nombre || 'Sin nombre registrado'}</h3>
-                    <span className="px-3 py-1 bg-fuchsia-100 text-fuchsia-700 rounded-full text-[10px] font-black tracking-widest uppercase border border-fuchsia-200 flex-shrink-0">
-                        {formData.direccion || 'Familiar'}
-                    </span>
-                </div>
-
-                <div className="flex items-center gap-3 self-end xl:self-auto">
-                    {saveStatus && (
-                        <span className={`text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1 animate-in fade-in
-                            ${saveStatus.type === 'success' ? 'text-emerald-600 bg-emerald-50' : 'text-red-600 bg-red-50'}`}>
-                            <span className="material-symbols-rounded text-[14px]">
-                                {saveStatus.type === 'success' ? 'check_circle' : 'error'}
-                            </span>
-                            {saveStatus.message}
-                        </span>
-                    )}
-
-                    <button
-                        onClick={handleSave}
-                        disabled={!hasChanges || isSaving}
-                        className={`flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg font-bold text-xs shadow-sm transition-all
-                            ${!hasChanges
-                                ? 'bg-slate-100 text-slate-400 cursor-not-allowed hidden xl:flex'
-                                : 'bg-fuchsia-600 text-white hover:bg-fuchsia-700 hover:shadow-md active:scale-95'}`}
-                    >
-                        {isSaving ? (
-                            <span className="material-symbols-rounded text-sm animate-spin">progress_activity</span>
-                        ) : (
-                            <span className="material-symbols-rounded text-sm">save</span>
-                        )}
-                        <span>Guardar</span>
-                    </button>
-                </div>
-            </div>
-
-            {/* Formulario del familiar */}
-            <div className="p-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-5 gap-y-4">
-                    <FamilyInputField label="Nombre Completo" field="nombre" value={formData.nombre} onChange={handleInputChange} icon="person" />
-                    <FamilyInputField label="Cédula" field="cedula" value={formData.cedula} onChange={handleInputChange} icon="badge" type="number" />
-                    <FamilyInputField label="Carnet" field="carnet" value={formData.carnet} onChange={handleInputChange} icon="id_card" />
-                    <FamilyInputField label="Celular" field="celular" value={formData.celular} onChange={handleInputChange} icon="smartphone" />
-                    <FamilySelectField
-                        label="Teléfono"
-                        field="telefono"
-                        value={formData.telefono}
-                        onChange={handleInputChange}
-                        icon="call"
-                        options={[{ label: 'Sí', value: 'Si' }, { label: 'No', value: 'No' }]}
-                    />
-                    <FamilyInputField label="Parentesco/Dirección" field="direccion" value={formData.direccion} onChange={handleInputChange} icon="family_restroom" />
-                    <FamilyInputField label="Nacimiento" field="nacimiento" value={formData.nacimiento} onChange={handleInputChange} icon="cake" type="date" />
-                </div>
-            </div>
-        </div>
-    );
-};
-
-// Input con Select para el formulario de familiares
-const FamilySelectField = ({ label, field, value, onChange, icon, options }: {
-    label: string, field: keyof FamilyMember, value: string | number | null | undefined,
-    onChange: (f: keyof FamilyMember, v: string) => void, icon: string, options: { label: string, value: string }[]
-}) => {
-    const displayValue = value === null || value === undefined ? '' : value.toString();
-    return (
-        <div className="space-y-1 group relative">
-            <label className="text-[10px] font-bold text-slate-400 group-focus-within:text-fuchsia-600 transition-colors uppercase tracking-widest flex items-center gap-1 hover:cursor-text">
-                <span className="material-symbols-rounded text-[14px]">{icon}</span>
-                {label}
-            </label>
-            <div className="relative">
-                <select
-                    value={displayValue}
-                    onChange={(e) => onChange(field, e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 font-semibold text-sm h-[38px] shadow-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-fuchsia-500/20 focus:border-fuchsia-500 hover:border-slate-300 transition-all appearance-none pr-8 cursor-pointer"
-                >
-                    <option value="" disabled className="text-slate-400 font-normal">Seleccione...</option>
-                    {options.map(opt => (
-                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                </select>
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 flex items-center">
-                    <span className="material-symbols-rounded text-[18px]">expand_more</span>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-// Input reducido para el formulario de familiares
-const FamilyInputField = ({ label, field, value, onChange, icon, type = "text" }: {
-    label: string, field: keyof FamilyMember, value: string | number | null | undefined,
-    onChange: (f: keyof FamilyMember, v: string) => void, icon: string, type?: string
-}) => {
-    const displayValue = value === null || value === undefined ? '' : value.toString();
-    return (
-        <div className="space-y-1 group">
-            <label className="text-[10px] font-bold text-slate-400 group-focus-within:text-fuchsia-600 transition-colors uppercase tracking-widest flex items-center gap-1 hover:cursor-text">
-                <span className="material-symbols-rounded text-[14px]">{icon}</span>
-                {label}
-            </label>
-            <input
-                type={type}
-                value={displayValue}
-                onChange={(e) => onChange(field, e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 font-semibold text-sm h-[38px] shadow-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-fuchsia-500/20 focus:border-fuchsia-500 hover:border-slate-300 transition-all placeholder:text-slate-300 placeholder:font-normal"
-                placeholder={label}
-            />
-        </div>
-    );
-};

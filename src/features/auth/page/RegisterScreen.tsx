@@ -7,8 +7,8 @@ import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
 
 // Lógica y Esquemas
-import { useRegister } from './hooks/useRegister';
-import { AuthLayout } from './components/layout/AuthLayout';
+import { useRegister } from '../hooks/useRegister';
+import { AuthLayout } from '../components/layout/AuthLayout';
 import {
     type RegisterFormInputs, type RegisterFormValues,
     registerSchema
