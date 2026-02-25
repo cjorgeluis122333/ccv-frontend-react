@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 import {usePartners} from '../hooks/usePartners';
 import type {FamilyMember, Partner} from '../types/partnerResponseType';
 import {partnerService} from '../service/partnerService';
@@ -6,11 +6,12 @@ import {usePartnerForm} from "@/features/partner/hooks/usePartnerForm.ts";
 import {useSearchPartner} from "@/features/partner/hooks/useSearchPartner.ts";
 import {InputField} from '@/components/input/InputField';
 import {FamilyMemberCard} from "@/features/partner/component/FamilyMemberCard.tsx";
-import {GenericSearch} from "@/components/input/SearchAutocomplete.tsx";
+import {GenericSearch} from "@/components/input/GenericSearch.tsx";
+import {useDebounce} from "@/hooks/useDebounce.ts";
 
 export const PartnerDataScreen = () => {
     // 1. Estado Global y del Dominio
-    const {partners, searchTerm, setSearchTerm, isLoading, refresh} = usePartners();
+    const {partners:allPartners, searchTerm, setSearchTerm, isLoading, refresh} = usePartners();
 
     // 2. Estado Local del Componente
     const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
@@ -36,12 +37,41 @@ export const PartnerDataScreen = () => {
         hasChanges,
         handleInputChange,
         handleSave,
-        resetForm // <-- Extraemos la nueva función
+        resetForm
     } = usePartnerForm(selectedPartner, (updatedPartner) => {
         setSelectedPartner(updatedPartner);
         resetForm(updatedPartner); // Sincronizamos tras guardar
         refresh();
     });
+
+// --- NUEVA LÓGICA DE RENDIMIENTO ---
+
+    // 2. Debounce: Espera 400ms después de que el usuario deja de escribir
+    const debouncedSearchTerm = useDebounce(searchTerm, 400);
+
+    // 3. Bandera de Shimmer: Si el texto actual no coincide con el debounced, estamos "filtrando"
+    const isFiltering = searchTerm.trim() !== debouncedSearchTerm.trim();
+
+    // 4. Filtro Pesado: Solo se ejecuta cuando el debounce cambia
+    const filteredPartners = useMemo(() => {
+        const term = debouncedSearchTerm.toLowerCase().trim();
+        if (!term) return [];
+
+        return allPartners.filter(p => {
+            // 1. Convertimos todo a string y usamos "?" por si el dato viene vacío (null/undefined)
+            // Usamos String() para asegurar que incluso si es un número, funcione el .includes
+            const nombre = p.nombre?.toLowerCase() || "";
+            const acc = String(p.acc || "");
+            const cedula = String(p.cedula || "");
+
+            return nombre.includes(term) ||
+                acc.includes(term) ||
+                cedula.includes(term);
+        }).slice(0, 50);
+    }, [debouncedSearchTerm, allPartners]);
+    // --- FIN DE LÓGICA DE RENDIMIENTO ---
+
+
     // Select partner
     const handleSelectPartner = async (partner: Partner) => {
         setSelectedPartner(partner);
@@ -95,13 +125,14 @@ export const PartnerDataScreen = () => {
             {/* Búsqueda */}
             <GenericSearch<Partner>
                 label="Buscar Socio Titular"
-                placeholder="Buscar por nombre, cédula o número de acción (acc)..."
-                searchTerm={searchTerm}
+                placeholder="Buscar por nombre, cédula o número de acción..."
+                searchTerm={searchTerm}           // Valor rápido para que el input no se trabe
                 onSearchChange={handleSearchChange}
                 onFocus={() => setIsDropdownOpen(true)}
                 isLoading={isLoading}
+                isFiltering={isFiltering}           // <--- PASAMOS LA NUEVA PROP
                 isDropdownOpen={isDropdownOpen}
-                items={partners}
+                items={filteredPartners}           // <--- PASAMOS LA LISTA FILTRADA LENTAMENTE
                 onSelectItem={handleSelectPartner}
                 dropdownRef={dropdownRef}
                 keyExtractor={(partner) => partner.acc}
