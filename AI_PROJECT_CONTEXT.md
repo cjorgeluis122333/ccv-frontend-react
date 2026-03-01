@@ -41,6 +41,7 @@ El proyecto utiliza una arquitectura altamente modular y encapsulada por dominio
 ### Estilos y UI
 **Regla:** NO usar CSS plano a menos que sea inevitable.
 *   Construir UI usando las clases utilitarias de Tailwind.
+*   **REGLA OBLIGATORIA SOBRE COMPONENTES:** Antes de generar una interfaz o formulario, DEBES comprobar si existe un componente genérico (ej. un input, button o select) en `src/components/` que permita reutilizar código. Si lo hay, úsalo obligatoriamente. Si no existe un componente genérico para ese caso pero es posible usar uno, **primero créalo en `src/components/`** y luego incorpóralo en tu interfaz. Esta idea debe guiar siempre tu desarrollo de UI.
 *   Reutilizar componentes de `src/components/` (como `Input`, `Button`) que ya tienen unificación de clases (usando `clsx` y `tailwind-merge`) en lugar de construir etiquetas HTML directas repetitivas.
 
 ## 4. Pasos para añadir una nueva característica (Feature)
