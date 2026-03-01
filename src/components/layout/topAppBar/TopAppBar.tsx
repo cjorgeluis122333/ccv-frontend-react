@@ -78,12 +78,16 @@ export const TopBar = () => {
 
                             {isMenuOpen && (
                                 <>
+                                    {/*TODO:  Performance appearance*/}
                                     <div className="fixed inset-0 z-40" onClick={() => setIsMenuOpen(false)} />
                                     <div className="absolute right-0 mt-3 w-60 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                                         <div className="px-5 py-3 border-b border-slate-50 mb-1">
                                             <p className="text-sm font-bold text-slate-800">{user?.name || 'Usuario'}</p>
                                             <p className="text-xs text-slate-400 truncate">
                                                 {user?.email || 'usuario@ccv.com'}
+                                            </p>
+                                            <p className="text-xs text-slate-400 truncate">
+                                                {user?.role || 'Usuario'}
                                             </p>
                                         </div>
 
