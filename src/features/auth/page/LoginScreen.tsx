@@ -1,11 +1,11 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'react-router-dom';
-import { Input } from "@/components/input/Input";
 import { Button } from "@/components/button/Button";
 import { type LoginFormValues, loginSchema } from '../schemas/loginSchema.ts';
 import { useLogin } from '../hooks/useLogin';
 import { AuthLayout } from '../components/layout/AuthLayout.tsx';
+import {SmartInput} from "@/components/input/SmartInput.tsx";
 
 
 export const LoginScreen = () => {
@@ -27,14 +27,14 @@ export const LoginScreen = () => {
             {/* Formulario */}
             {/* Pasamos la función 'login' del hook al handleSubmit */}
             <form onSubmit={handleSubmit(login)} className="space-y-5">
-                <Input
+                <SmartInput
                     label="Número de Acción"
                     placeholder="Ej: 1234"
                     error={errors.acc?.message}
                     {...register("acc")}
                 />
 
-                <Input
+                <SmartInput
                     label="Contraseña"
                     type="password"
                     placeholder="••••••••"

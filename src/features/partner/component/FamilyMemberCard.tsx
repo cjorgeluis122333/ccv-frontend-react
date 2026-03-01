@@ -10,7 +10,6 @@ import {useToast} from "@/contexts/ToastContext.tsx";
 export const FamilyMemberCard = ({member, number}: { member: FamilyMember, number: number }) => {
     const [formData, setFormData] = useState<Partial<FamilyMember>>(member);
     const [isSaving, setIsSaving] = useState(false);
-    // const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const {showToast} = useToast();
 
     // Sincronizar si cambia el miembro (por ej., al seleccionar otro titular diferente)
