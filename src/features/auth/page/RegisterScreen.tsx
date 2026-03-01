@@ -1,7 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'react-router-dom';
-import { Input } from "@/components/input/Input";
 import { Button } from "@/components/button/Button";
 
 // Lógica y Esquemas
@@ -11,10 +10,11 @@ import {
     type RegisterFormInputs, type RegisterFormValues,
     registerSchema
 } from "@/features/auth/schemas/registerSchemas.ts";
+import {SmartInput} from "@/components/input/SmartInput.tsx";
 
 export const RegisterScreen = () => {
     // 1. Hook de lógica
-    const { registerUser, isLoading, serverError } = useRegister();
+    const { registerUser, isLoading } = useRegister();
 
     // 2. Hook del formulario
     const {
@@ -30,13 +30,8 @@ export const RegisterScreen = () => {
             title="Crear Cuenta"
             subtitle="Únete a nuestra comunidad"
         >
-            {/* Mensaje de error del servidor */}
-            {serverError && (
-                <div className="mb-4 p-3 rounded-lg bg-red-50 text-red-600 text-xs font-semibold text-center">
-                    {serverError}
-                </div>
-            )}
-            {/* 2. Forzamos el tipado en el submit.
+
+            {/* 1. Forzamos el tipado en el submit.
                Como usamos zodResolver, handleSubmit garantiza que si se llama a
                registerUser, los datos ya pasaron por el esquema y son del tipo Output.
             */}
@@ -45,7 +40,7 @@ export const RegisterScreen = () => {
                 className="space-y-4"
             >
                 {/* Inputs Numéricos */}
-                <Input
+                <SmartInput
                     label="Número de Acción"
                     placeholder="Ej: 1234"
                     type="number" // HTML5 type ayuda, pero Zod valida
@@ -53,7 +48,7 @@ export const RegisterScreen = () => {
                     {...register("acc")}
                 />
 
-                <Input
+                <SmartInput
                     label="Cédula"
                     placeholder="Ej: 100200300"
                     type="number"
@@ -62,7 +57,7 @@ export const RegisterScreen = () => {
                 />
 
                 {/* Correo */}
-                <Input
+                <SmartInput
                     label="Correo Electrónico"
                     placeholder="tu@email.com"
                     type="email"
@@ -72,7 +67,7 @@ export const RegisterScreen = () => {
 
                 {/* Contraseñas en Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Input
+                    <SmartInput
                         label="Contraseña"
                         type="password"
                         placeholder="••••••"
@@ -80,7 +75,7 @@ export const RegisterScreen = () => {
                         {...register("password")}
                     />
 
-                    <Input
+                    <SmartInput
                         label="Confirmar"
                         type="password"
                         placeholder="••••••"
