@@ -2,12 +2,13 @@
 import { useState, useMemo, useEffect } from 'react';
 import { partnerService } from '../service/partnerService';
 import type { Partner } from '../types/partnerResponseType';
+import {useToast} from "@/contexts/ToastContext.tsx";
 
 export const usePartnerForm = (initialPartner: Partner | null, onSaveSuccess: (partner: Partner) => void) => {
     const [formData, setFormData] = useState<Partial<Partner>>({});
     const [isSaving, setIsSaving] = useState(false);
     const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
-
+    const { showToast } = useToast();
     // Autolimpiar alertas
     useEffect(() => {
         if (saveStatus) {
@@ -39,11 +40,16 @@ export const usePartnerForm = (initialPartner: Partner | null, onSaveSuccess: (p
         setIsSaving(true);
         try {
             const updated = await partnerService.update(initialPartner.acc, formData);
+           // Update partner
             setSaveStatus({ type: 'success', message: 'Datos actualizados correctamente' });
             onSaveSuccess(updated); // Pasamos el actualizado
+            // Show toast
+            showToast(`¡El socio a sido modificado correctamente!`, 'success');
             return updated;
         } catch (error) {
             setSaveStatus({ type: 'error', message: 'Error al actualizar los datos' });
+            // Si tu backend devuelve mensajes de error, podrías usar: error.response?.data?.message || errorMsg
+            showToast("Error al actualizar los datos", 'error');
             throw error;
         } finally {
             setIsSaving(false);
