@@ -17,7 +17,7 @@ import { PartnerHistoryList } from "@/features/partner/component/PartnerHistoryL
 export const PartnerDataScreen = () => {
     // 1. Estado Global y del Dominio
     const { partners: allPartners, searchTerm, setSearchTerm, isLoading, refresh } = usePartners();
-    const { history, isLoadingHistory, errorHistory, loadHistory, resetHistory } = usePartnerHistory();
+    const { historyData, isLoadingHistory, errorHistory, loadHistory, resetHistory } = usePartnerHistory();
 
     // 2. Estado Local del Componente
     const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
@@ -121,6 +121,12 @@ export const PartnerDataScreen = () => {
 
         // Disparamos la carga del historial al mismo tiempo
         loadHistory(Number(partner.acc));
+    };
+
+    const handlePageChange = (page: number) => {
+        if (selectedPartner) {
+            loadHistory(Number(selectedPartner.acc), page);
+        }
     };
 
     return (
@@ -380,7 +386,12 @@ export const PartnerDataScreen = () => {
                     </div>
 
                     {/* Historial del Socio */}
-                    <PartnerHistoryList history={history} isLoading={isLoadingHistory} error={errorHistory} />
+                    <PartnerHistoryList
+                        historyData={historyData}
+                        isLoading={isLoadingHistory}
+                        error={errorHistory}
+                        onPageChange={handlePageChange}
+                    />
                 </div>
             )}
 

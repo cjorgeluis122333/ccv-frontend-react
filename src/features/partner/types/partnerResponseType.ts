@@ -54,9 +54,3 @@ export interface HistoryItem {
     seniat: string;
     operador: string;
 }
-
-export interface HistoryResponse {
-    status: string;
-    message: string | null;
-    data: HistoryItem[];
-}
