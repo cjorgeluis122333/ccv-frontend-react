@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { LoginScreen } from '@/features/auth/LoginScreen.tsx';
-import { RegisterScreen } from '@/features/auth/RegisterScreen.tsx';
+import { LoginScreen } from '@/features/auth/page/LoginScreen.tsx';
+import { RegisterScreen } from '@/features/auth/page/RegisterScreen.tsx';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Dashboard } from "@/features/dashboard/component/DashboardScreen.tsx";
 import { PartnersList } from '@/features/partner/pages/PartnersList';

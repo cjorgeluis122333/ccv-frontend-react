@@ -41,3 +41,16 @@ export interface FamilyResponse {
     message: string | null;
     data: FamilyMember[];
 }
+
+export interface HistoryItem {
+    ind: number;
+    acc: number;
+    time: string;
+    fecha: string;
+    mes: string;
+    oper: string;
+    monto: string;
+    descript: string;
+    seniat: string;
+    operador: string;
+}

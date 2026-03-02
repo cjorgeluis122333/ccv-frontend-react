@@ -20,7 +20,7 @@ export const NavSidebar = ({ isExpanded, onToggle, className }: NavSidebarProps)
     return (
         <aside
             className={cn(
-                "fixed top-0 left-0 z-50 h-full bg-white border-r border-slate-100 transition-all duration-300 ease-in-out flex flex-col overflow-hidden",
+                "fixed top-0 left-0 z-50 h-full bg-white/60 backdrop-blur-2xl border-r border-white/30 shadow-[4px_0_24px_-4px_rgba(0,0,0,0.02)] transition-all duration-300 ease-in-out flex flex-col overflow-hidden",
                 isExpanded ? "w-[280px]" : "w-[80px]",
                 className
             )}
@@ -29,12 +29,12 @@ export const NavSidebar = ({ isExpanded, onToggle, className }: NavSidebarProps)
             <div className="h-16 flex items-center px-6 mb-4">
                 <button
                     onClick={onToggle}
-                    className="p-2 rounded-xl text-slate-600 hover:bg-slate-50 transition-all active:scale-95"
+                    className="p-2 rounded-xl text-slate-500 hover:bg-primary/10 hover:text-primary transition-all active:scale-95"
                 >
                     <span className="material-symbols-rounded text-2xl">menu</span>
                 </button>
                 <span className={cn(
-                    "ml-4 font-black text-slate-900 tracking-tight transition-opacity duration-300 whitespace-nowrap",
+                    "ml-4 font-display font-black text-slate-800 tracking-wider transition-opacity duration-300 whitespace-nowrap",
                     isExpanded ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
                 )}>
                     MENU
@@ -62,7 +62,7 @@ export const NavSidebar = ({ isExpanded, onToggle, className }: NavSidebarProps)
             </div>
 
             {/* Footer */}
-            <div className="p-4 bg-slate-50/50 border-t border-slate-50 flex justify-center text-[10px] font-bold text-slate-400 whitespace-nowrap overflow-hidden">
+            <div className="p-4 bg-transparent border-t border-slate-200/50 flex justify-center text-[10px] font-bold text-slate-400 whitespace-nowrap overflow-hidden tracking-widest font-display">
                 {isExpanded ? "VERSIÓN 1.0.0" : "V1"}
             </div>
         </aside>

@@ -9,12 +9,10 @@ export const useRegister = () => {
     const navigate = useNavigate();
     const {showToast} = useToast();
     const [isLoading, setIsLoading] = useState(false);
-    const [serverError, setServerError] = useState<string | null>(null);
 
     const registerUser = async (data: RegisterFormValues) => {
         if (isLoading) return;
         setIsLoading(true);
-        setServerError(null);
 
         try {
             // 1. Petición (El service debe aceptar RegisterFormValues)
@@ -34,12 +32,11 @@ export const useRegister = () => {
         catch (error: any) {
             // Lógica para extraer el mensaje de error del backend
             const msg = error.response?.data?.message || error.message || "Error al crear la cuenta";
-            setServerError(msg);
             showToast(msg, 'error');
         } finally {
             setIsLoading(false);
         }
     };
 
-    return {registerUser, isLoading, serverError};
+    return {registerUser, isLoading};
 };

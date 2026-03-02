@@ -32,8 +32,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                         type={inputType}
                         ref={ref}
                         className={cn(
-                            "flex h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm transition-all",
-                            "placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500",
+                            "flex h-11 w-full rounded-xl border border-slate-200 bg-white/50 backdrop-blur-sm px-4 py-2 text-sm transition-all shadow-sm hover:border-slate-300",
+                            "placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white",
                             "disabled:cursor-not-allowed disabled:opacity-50",
                             // Añadir padding derecho si es password para que el texto no se pise con el icono
                             isPassword && "pr-12",

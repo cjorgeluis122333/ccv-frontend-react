@@ -4,6 +4,7 @@ export interface User {
     acc: number;
     cedula: number;
     correo: string;
+    role:string;
     created_at: string;
     updated_at: string;
 }
