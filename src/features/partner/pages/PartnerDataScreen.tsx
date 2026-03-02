@@ -71,10 +71,9 @@ export const PartnerDataScreen = () => {
             nacimiento: '',
             ingreso: '',
             ocupacion: '',
-            cobrador: ''
+            cobrador: 0
         }
     });
-
     // Hook simplificado para manejar la llamada HTTP de los socios
     const { isSaving, handleSave } = usePartnerForm(selectedPartner, (updatedPartner) => {
         setSelectedPartner(updatedPartner);
@@ -93,18 +92,18 @@ export const PartnerDataScreen = () => {
 
         // Sincroniza velozmente React Hook Form
         reset({
-            acc: Number(partner.acc),
-            cedula: String(partner.cedula || ''),
+            acc: partner.acc, // Ya es number
+            cedula: String(partner.cedula), // Convertimos number -> string
             carnet: partner.carnet || '',
             nombre: partner.nombre || '',
             celular: partner.celular || '',
             telefono: partner.telefono || '',
-            correo: partner.correo || '',
+            correo: partner.correo || '', // El esquema ahora acepta null/string
             direccion: partner.direccion || '',
             nacimiento: partner.nacimiento || '',
             ingreso: partner.ingreso || '',
             ocupacion: partner.ocupacion || '',
-            cobrador: partner.cobrador || ''
+            cobrador: Number(partner.cobrador) || 0 // Convertimos string -> number
         });
 
         setSearchTerm(partner.nombre);
