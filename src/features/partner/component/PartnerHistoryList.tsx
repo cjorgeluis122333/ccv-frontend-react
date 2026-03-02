@@ -64,7 +64,8 @@ export const PartnerHistoryList = ({ historyData, isLoading, error, onPageChange
                 </div>
             </div>
 
-            <div className="overflow-x-auto">
+            {/* Vista Desktop (Tabla) */}
+            <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="bg-slate-50/80 border-b border-slate-100 text-xs font-bold text-slate-500 uppercase tracking-wider">
@@ -114,6 +115,51 @@ export const PartnerHistoryList = ({ historyData, isLoading, error, onPageChange
                         ))}
                     </tbody>
                 </table>
+            </div>
+
+            {/* Vista Mobile (Tarjetas) */}
+            <div className="block md:hidden">
+                <div className="px-5 py-3 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    <span>Detalle de Operaciones</span>
+                </div>
+                <div className="divide-y divide-slate-100 flex flex-col relative w-full">
+                    {isLoading && (
+                        <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 w-full h-full"></div>
+                    )}
+                    {history.map((item) => (
+                        <div key={item.ind} className="p-5 flex flex-col gap-4 hover:bg-slate-50/50 transition-colors w-full">
+                            <div className="flex justify-between items-start gap-4">
+                                <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+                                    <span className="text-sm font-bold text-slate-800 leading-snug">{item.descript}</span>
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-600 border border-indigo-100 uppercase tracking-wider">
+                                            {item.oper.split('|')[0] || 'Ope'}
+                                        </span>
+                                        <span className="text-xs font-semibold text-slate-500">Ref: {item.mes}</span>
+                                    </div>
+                                </div>
+                                <span className="text-sm font-black text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100 shadow-sm whitespace-nowrap shrink-0">
+                                    ${Number(item.monto).toFixed(2)}
+                                </span>
+                            </div>
+
+                            <div className="flex items-center justify-between pt-3 border-t border-slate-50">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200">
+                                        <span className="material-symbols-rounded text-slate-400 text-[14px]">calendar_today</span>
+                                    </div>
+                                    <span className="text-xs font-bold text-slate-600">{item.fecha}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs font-semibold text-slate-500 capitalize">{item.operador}</span>
+                                    <div className="w-7 h-7 rounded-full bg-indigo-50 flex items-center justify-center border border-indigo-100">
+                                        <span className="material-symbols-rounded text-indigo-400 text-[16px]">person</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
 
             {/* Controles de Paginación */}
