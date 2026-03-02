@@ -7,15 +7,48 @@ interface BoardMemberCardProps {
 
 const BoardMemberCard = ({ member, role }: BoardMemberCardProps) => {
     return (
-        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center text-center transition-all hover:shadow-md hover:border-blue-100 group">
-            <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-3 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                <span className="material-symbols-rounded text-2xl">person</span>
+        <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 flex flex-col items-center text-center transition-all hover:shadow-2xl hover:shadow-blue-100 hover:border-blue-200 group overflow-hidden relative">
+            {/* Decorative gradient overlay */}
+            <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-blue-50/50 to-transparent pointer-events-none"></div>
+
+            {/* Photo Placeholder & Flags */}
+            <div className="mt-8 relative z-10">
+                <div className="w-32 h-32 rounded-full border-4 border-white shadow-xl overflow-hidden bg-slate-100 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+                    <span className="material-symbols-rounded text-6xl text-slate-300">account_circle</span>
+                </div>
+
+                {/* Flag badges - Image based */}
+                <div className="absolute -top-3 -right-3 flex flex-col gap-2">
+                    <div className="w-10 h-7 shadow-lg rounded-lg overflow-hidden border-2 border-white ring-1 ring-slate-100 rotate-3 group-hover:rotate-0 transition-transform duration-300">
+                        <img src="https://flagcdn.com/cu.svg" alt="Cuba" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="w-10 h-7 shadow-lg rounded-lg overflow-hidden border-2 border-white ring-1 ring-slate-100 -rotate-3 group-hover:rotate-0 transition-transform duration-300">
+                        <img src="https://flagcdn.com/ve.svg" alt="Venezuela" className="w-full h-full object-cover" />
+                    </div>
+                </div>
             </div>
-            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{role}</h3>
-            <p className="text-sm font-bold text-slate-800 mb-2">{member.nombre}</p>
-            <div className="flex items-center gap-2 text-[11px] font-medium text-slate-500 bg-slate-50 px-3 py-1 rounded-lg">
-                <span className="material-symbols-rounded text-sm">badge</span>
-                <span>{member.cedula}</span>
+
+            <div className="p-8 pt-6 w-full relative z-10">
+                <div className="mb-4">
+                    <span className="px-4 py-1.5 bg-blue-50 text-blue-700 rounded-full text-[11px] font-black uppercase tracking-[0.2em] border border-blue-100">
+                        {role}
+                    </span>
+                </div>
+
+                <h3 className="text-xl font-black text-slate-800 mb-2 leading-tight group-hover:text-blue-700 transition-colors">
+                    {member.nombre}
+                </h3>
+
+                <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-slate-50">
+                    <div className="flex items-center justify-center gap-2 text-xs font-bold text-slate-400">
+                        <span className="material-symbols-rounded text-sm">badge</span>
+                        <span>CÉDULA: {member.cedula}</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-2 text-xs font-black text-blue-600 bg-blue-50/50 py-2 px-4 rounded-xl mx-auto">
+                        <span className="material-symbols-rounded text-base">real_estate_agent</span>
+                        <span>ACCIÓN: {member.acc}</span>
+                    </div>
+                </div>
             </div>
         </div>
     );
@@ -43,7 +76,7 @@ export const BoardMemberGrid = ({ board }: BoardMemberGridProps) => {
     ];
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 py-4">
             {roles.map((role) => {
                 const member = board[role.key as keyof BoardYear] as BoardMember;
                 if (!member) return null;

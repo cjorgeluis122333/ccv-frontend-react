@@ -32,37 +32,28 @@ export const BoardScreen = () => {
 
     return (
         <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="mb-10">
-                <div className="flex items-center gap-4 mb-3">
-                    <div className="p-3 bg-blue-100 text-blue-600 rounded-2xl">
-                        <span className="material-symbols-rounded text-3xl block">groups</span>
-                    </div>
-                    <div>
-                        <h1 className="text-3xl font-black text-slate-800 tracking-tight italic uppercase">Junta Directiva</h1>
-                        <p className="text-slate-500 font-medium">Histórico de directivos por período anual</p>
-                    </div>
+            <div className="mb-12 flex flex-col items-center">
+                <h1 className="text-4xl font-black text-slate-800 tracking-tight mb-8">
+                    Junta Directiva {selectedYear ? `${selectedYear} - ${selectedYear + 1}` : ""}
+                </h1>
+
+                <div className="w-full flex justify-center">
+                    <YearSelector
+                        years={availableYears}
+                        selectedYear={selectedYear}
+                        onSelectYear={setSelectedYear}
+                    />
                 </div>
             </div>
 
-            <div className="bg-slate-50/50 p-6 rounded-[2.5rem] border border-slate-100">
-                <h2 className="text-base font-black text-slate-400 mb-4 tracking-widest uppercase">Seleccionar Año</h2>
-                <YearSelector
-                    years={availableYears}
-                    selectedYear={selectedYear}
-                    onSelectYear={setSelectedYear}
-                />
-
+            <div className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm">
                 {selectedBoard ? (
-                    <div className="mt-8 animate-in fade-in zoom-in-95 duration-500">
-                        <div className="flex items-center gap-2 mb-6 ml-1">
-                            <span className="w-1.5 h-6 bg-blue-600 rounded-full"></span>
-                            <h2 className="text-xl font-bold text-slate-800">Directivos de {selectedYear}</h2>
-                        </div>
+                    <div className="animate-in fade-in zoom-in-95 duration-700">
                         <BoardMemberGrid board={selectedBoard} />
                     </div>
                 ) : (
-                    <div className="p-12 text-center text-slate-400 bg-white rounded-3xl border border-dashed border-slate-200">
-                        No hay información disponible para este año.
+                    <div className="p-12 text-center text-slate-400 bg-slate-50 rounded-3xl border border-dashed border-slate-200">
+                        No hay información disponible para este período.
                     </div>
                 )}
             </div>
