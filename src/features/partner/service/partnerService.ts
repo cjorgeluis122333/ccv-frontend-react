@@ -22,6 +22,10 @@ export const partnerService = {
         const { data } = await api.put<{ message: string; data: FamilyMember }>(`/family/${id}`, familyData);
         return data.data;
     },
+    createFamily: async (familyData: Partial<FamilyMember>): Promise<FamilyMember> => {
+        const { data } = await api.post<{ message: string; data: FamilyMember }>('/family', familyData);
+        return data.data;
+    },
     getHistory: async (acc: number, page: number = 1): Promise<PaginatedResponse<HistoryItem>> => {
         const { data } = await api.get<PaginatedResponse<HistoryItem>>(`/history/${acc}`, {
             params: { page }

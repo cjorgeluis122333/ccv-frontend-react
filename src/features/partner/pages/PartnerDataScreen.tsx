@@ -13,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { partnerSchema, type PartnerFormValues } from "../schemas/partnerSchema";
 import { usePartnerHistory } from "@/features/partner/hooks/usePartnerHistory.ts";
 import { PartnerHistoryList } from "@/features/partner/component/PartnerHistoryList.tsx";
+import { AddFamilyMemberModal } from "@/features/partner/component/AddFamilyMemberModal.tsx";
 
 export const PartnerDataScreen = () => {
     // 1. Estado Global y del Dominio
@@ -23,6 +24,7 @@ export const PartnerDataScreen = () => {
     const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
     const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
     const [isLoadingFamily, setIsLoadingFamily] = useState(false);
+    const [isAddFamilyModalOpen, setIsAddFamilyModalOpen] = useState(false);
 
     // 3. Integración de Hooks para la búsqueda
     const {
@@ -56,7 +58,7 @@ export const PartnerDataScreen = () => {
         reset,
         formState: { errors, isDirty, isSubmitting }
     } = useForm<PartnerFormValues>({
-        resolver: zodResolver(partnerSchema) as any,
+        resolver: zodResolver(partnerSchema),
         defaultValues: {
             acc: 0,
             cedula: '',
@@ -351,6 +353,13 @@ export const PartnerDataScreen = () => {
                                 <p className="text-xs text-slate-500 font-medium">Familiares asociados al
                                     titular {selectedPartner.nombre}</p>
                             </div>
+                            <button
+                                onClick={() => setIsAddFamilyModalOpen(true)}
+                                className="ml-auto flex items-center gap-2 px-4 py-2 bg-fuchsia-600 text-white rounded-xl font-bold text-xs shadow-md shadow-fuchsia-100 hover:bg-fuchsia-700 transition-all active:scale-95"
+                            >
+                                <span className="material-symbols-rounded text-sm">person_add</span>
+                                <span>Agregar</span>
+                            </button>
                         </div>
 
                         <div className="p-6 sm:p-8 bg-slate-50/30">
@@ -408,6 +417,15 @@ export const PartnerDataScreen = () => {
                         junto con su grupo familiar asociado.
                     </p>
                 </div>
+            )}
+
+            {selectedPartner && (
+                <AddFamilyMemberModal
+                    isOpen={isAddFamilyModalOpen}
+                    onClose={() => setIsAddFamilyModalOpen(false)}
+                    acc={Number(selectedPartner.acc)}
+                    onSuccess={(newMember) => setFamilyMembers(prev => [...prev, newMember])}
+                />
             )}
         </div>
     );
