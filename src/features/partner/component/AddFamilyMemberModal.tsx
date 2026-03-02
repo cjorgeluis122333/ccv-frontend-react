@@ -60,7 +60,7 @@ export const AddFamilyMemberModal = ({ isOpen, onClose, acc, onSuccess }: AddFam
             const mappedData: Partial<FamilyMember> = {
                 ...data,
                 acc,
-                cedula: Number(data.cedula),
+                cedula: data.cedula ? Number(data.cedula) : null as unknown as number,
                 categoria: 'familiar',
                 cobrador: 0
             };
