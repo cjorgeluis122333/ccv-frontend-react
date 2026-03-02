@@ -11,10 +11,13 @@ import { SmartInput } from "@/components/input/SmartInput.tsx";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { partnerSchema, type PartnerFormValues } from "../schemas/partnerSchema";
+import { usePartnerHistory } from "@/features/partner/hooks/usePartnerHistory.ts";
+import { PartnerHistoryList } from "@/features/partner/component/PartnerHistoryList.tsx";
 
 export const PartnerDataScreen = () => {
     // 1. Estado Global y del Dominio
     const { partners: allPartners, searchTerm, setSearchTerm, isLoading, refresh } = usePartners();
+    const { history, isLoadingHistory, errorHistory, loadHistory, resetHistory } = usePartnerHistory();
 
     // 2. Estado Local del Componente
     const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
@@ -31,6 +34,7 @@ export const PartnerDataScreen = () => {
         // Callback: Qué hacer cuando se limpia el buscador
         setSelectedPartner(null);
         setFamilyMembers([]);
+        resetHistory();
     });
 
     // 4. Usamos el Hook Genérico de Filtrado
@@ -114,6 +118,9 @@ export const PartnerDataScreen = () => {
         } finally {
             setIsLoadingFamily(false);
         }
+
+        // Disparamos la carga del historial al mismo tiempo
+        loadHistory(Number(partner.acc));
     };
 
     return (
@@ -371,6 +378,9 @@ export const PartnerDataScreen = () => {
                             )}
                         </div>
                     </div>
+
+                    {/* Historial del Socio */}
+                    <PartnerHistoryList history={history} isLoading={isLoadingHistory} error={errorHistory} />
                 </div>
             )}
 
