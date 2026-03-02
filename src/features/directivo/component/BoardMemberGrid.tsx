@@ -31,12 +31,8 @@ const BoardMemberCard = ({ member, role }: BoardMemberCardProps) => {
                 </h3>
 
                 <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-slate-50">
-                    <div className="flex items-center justify-center gap-2 text-xs font-bold text-slate-400">
-                        <span className="material-symbols-rounded text-sm">badge</span>
-                        <span>CÉDULA: {member.cedula}</span>
-                    </div>
-                    <div className="flex items-center justify-center gap-2 text-xs font-black text-blue-600 bg-blue-50/50 py-2 px-4 rounded-xl mx-auto">
-                        <span className="material-symbols-rounded text-base">real_estate_agent</span>
+                    <div className="flex items-center justify-center gap-2 text-[13px] font-black text-blue-600 bg-blue-50 py-2.5 px-6 rounded-2xl mx-auto ring-1 ring-blue-100 shadow-sm transition-all group-hover:bg-blue-600 group-hover:text-white group-hover:ring-blue-600">
+                        <span className="material-symbols-rounded text-lg">real_estate_agent</span>
                         <span>ACCIÓN: {member.acc}</span>
                     </div>
                 </div>

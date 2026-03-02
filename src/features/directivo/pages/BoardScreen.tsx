@@ -32,28 +32,37 @@ export const BoardScreen = () => {
 
     return (
         <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="mb-12 flex items-center justify-between gap-6 max-w-4xl mx-auto">
-                {/* Venezuela Flag - Left */}
-                <div className="w-16 h-10 shadow-xl rounded-xl overflow-hidden border-2 border-white ring-1 ring-slate-100 flex-shrink-0">
-                    <img src="https://flagcdn.com/ve.svg" alt="Venezuela" className="w-full h-full object-cover" />
+            {/* Responsive Header with Premium Flags */}
+            <div className="mb-12 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 max-w-5xl mx-auto px-4">
+                {/* Venezuela Flag - Left (Premium Styling) */}
+                <div className="flex-shrink-0 group">
+                    <div className="w-20 h-20 rounded-full border-4 border-white shadow-2xl overflow-hidden ring-4 ring-blue-50/50 transform group-hover:scale-110 transition-transform duration-500">
+                        <img src="https://flagcdn.com/ve.svg" alt="Venezuela" className="w-full h-full object-cover scale-150" />
+                    </div>
                 </div>
 
-                <div className="flex flex-col items-center text-center flex-grow">
-                    <h1 className="text-4xl font-black text-slate-800 tracking-tight leading-none mb-2">
+                <div className="flex flex-col items-center text-center">
+                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-800 tracking-tight leading-none mb-4">
                         Junta Directiva
                     </h1>
-                    <p className="text-2xl font-bold text-blue-600 bg-blue-50 px-6 py-1 rounded-full border border-blue-100 italic">
-                        {selectedYear ? `${selectedYear} - ${selectedYear + 1}` : "Cargando..."}
-                    </p>
+                    <div className="flex items-center gap-3">
+                        <div className="h-px w-8 bg-slate-200 hidden sm:block"></div>
+                        <p className="text-lg sm:text-2xl font-black text-blue-600 bg-blue-50/80 backdrop-blur-sm px-8 py-2 rounded-2xl border border-blue-100 shadow-sm whitespace-nowrap">
+                            {selectedYear ? `${selectedYear} - ${selectedYear + 1}` : "..."}
+                        </p>
+                        <div className="h-px w-8 bg-slate-200 hidden sm:block"></div>
+                    </div>
                 </div>
 
-                {/* Cuba Flag - Right */}
-                <div className="w-16 h-10 shadow-xl rounded-xl overflow-hidden border-2 border-white ring-1 ring-slate-100 flex-shrink-0">
-                    <img src="https://flagcdn.com/cu.svg" alt="Cuba" className="w-full h-full object-cover" />
+                {/* Cuba Flag - Right (Premium Styling) */}
+                <div className="flex-shrink-0 group">
+                    <div className="w-20 h-20 rounded-full border-4 border-white shadow-2xl overflow-hidden ring-4 ring-blue-50/50 transform group-hover:scale-110 transition-transform duration-500">
+                        <img src="https://flagcdn.com/cu.svg" alt="Cuba" className="w-full h-full object-cover scale-150" />
+                    </div>
                 </div>
             </div>
 
-            <div className="w-full flex justify-center mb-12">
+            <div className="w-full flex justify-center mb-16">
                 <YearSelector
                     years={availableYears}
                     selectedYear={selectedYear}
