@@ -17,7 +17,7 @@ import { PartnerHistoryList } from "@/features/partner/component/PartnerHistoryL
 export const PartnerDataScreen = () => {
     // 1. Estado Global y del Dominio
     const { partners: allPartners, searchTerm, setSearchTerm, isLoading, refresh } = usePartners();
-    const { historyData, isLoadingHistory, errorHistory, loadHistory, resetHistory } = usePartnerHistory();
+    const { historyData, isLoadingHistory, errorHistory, loadHistory, resetHistory } = usePartnerHistory();  //Pagination
 
     // 2. Estado Local del Componente
     const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
