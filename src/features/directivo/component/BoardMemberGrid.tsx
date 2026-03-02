@@ -17,15 +17,6 @@ const BoardMemberCard = ({ member, role }: BoardMemberCardProps) => {
                     <span className="material-symbols-rounded text-6xl text-slate-300">account_circle</span>
                 </div>
 
-                {/* Flag badges - Image based */}
-                <div className="absolute -top-3 -right-3 flex flex-col gap-2">
-                    <div className="w-10 h-7 shadow-lg rounded-lg overflow-hidden border-2 border-white ring-1 ring-slate-100 rotate-3 group-hover:rotate-0 transition-transform duration-300">
-                        <img src="https://flagcdn.com/cu.svg" alt="Cuba" className="w-full h-full object-cover" />
-                    </div>
-                    <div className="w-10 h-7 shadow-lg rounded-lg overflow-hidden border-2 border-white ring-1 ring-slate-100 -rotate-3 group-hover:rotate-0 transition-transform duration-300">
-                        <img src="https://flagcdn.com/ve.svg" alt="Venezuela" className="w-full h-full object-cover" />
-                    </div>
-                </div>
             </div>
 
             <div className="p-8 pt-6 w-full relative z-10">
