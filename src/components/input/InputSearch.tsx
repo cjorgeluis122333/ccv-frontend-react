@@ -1,5 +1,5 @@
-import type {ChangeEvent, ReactNode, RefObject} from 'react';
-import {ShimmerList} from "@/components/loading/ShimmerList.tsx";
+import type { ChangeEvent, ReactNode, RefObject } from 'react';
+import { ShimmerList } from "@/components/loading/ShimmerList.tsx";
 
 interface GenericSearchProps<T> {
     label: string;
@@ -17,21 +17,20 @@ interface GenericSearchProps<T> {
     dropdownRef: RefObject<HTMLDivElement | null>;
 }
 
-export const InputSearch = <T, >({
-                                       label,
-                                       placeholder = "Buscar...",
-                                       searchTerm,
-                                       onSearchChange,
-                                       onFocus,
-                                       isLoading,
-                                       isFiltering = false, // Por defecto falso
-                                       isDropdownOpen,
-                                       items,
-                                       onSelectItem,
-                                       keyExtractor,
-                                       renderItem,
-                                       dropdownRef
-                                   }: GenericSearchProps<T>) => {
+export const InputSearch = <T,>({
+    label,
+    placeholder = "Buscar...",
+    searchTerm,
+    onSearchChange,
+    onFocus,
+    isFiltering = false, // Por defecto falso
+    isDropdownOpen,
+    items,
+    onSelectItem,
+    keyExtractor,
+    renderItem,
+    dropdownRef
+}: GenericSearchProps<T>) => {
 
     // Mostramos el dropdown si está abierto y hay texto
     const showDropdown = isDropdownOpen && searchTerm.trim() !== '';
@@ -52,13 +51,6 @@ export const InputSearch = <T, >({
                     onFocus={onFocus}
                     className="w-full pl-12 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all placeholder:text-slate-400 font-medium"
                 />
-                {/* Spinner unificado para API o Filtro Local */}
-                {(isLoading || isFiltering) && (
-                    <span
-                        className="absolute right-4 top-1/2 -translate-y-1/2 material-symbols-rounded text-indigo-500 animate-spin">
-                        progress_activity
-                    </span>
-                )}
             </div>
 
             {/* Dropdown Genérico con Shimmer */}
@@ -68,7 +60,7 @@ export const InputSearch = <T, >({
 
                     {isFiltering ? (
                         /* EFECTO SHIMMER (Loading) */
-                        <ShimmerList count={4}/>
+                        <ShimmerList count={4} />
 
                     ) : items.length > 0 ? (
                         /* RESULTADOS REALES */
