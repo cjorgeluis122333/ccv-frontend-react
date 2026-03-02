@@ -15,16 +15,16 @@ interface SmartInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 export const SmartInput = forwardRef<HTMLInputElement, SmartInputProps>(
     ({
-         label,
-         error,
-         icon: Icon,
-         styles = INPUT_THEMES.indigo,
-         type = "text",
-         className,
-         disabled,
-         placeholder,
-         ...props
-     }, ref) => {
+        label,
+        error,
+        icon: Icon,
+        styles = INPUT_THEMES.indigo,
+        type = "text",
+        className,
+        disabled,
+        placeholder,
+        ...props
+    }, ref) => {
         const [showPassword, setShowPassword] = useState(false);
 
         const isPassword = type === 'password';
@@ -58,8 +58,8 @@ export const SmartInput = forwardRef<HTMLInputElement, SmartInputProps>(
                         placeholder={placeholder || `Ingrese ${label.toLowerCase()}...`}
                         className={cn(
                             // Clases base (Input 2)
-                            "flex h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm transition-all",
-                            "placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500",
+                            "flex h-11 w-full rounded-xl border border-slate-200 bg-white/50 backdrop-blur-sm px-4 py-2 text-sm transition-all shadow-sm hover:border-slate-300",
+                            "placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white",
                             "disabled:cursor-not-allowed disabled:opacity-50",
                             // Inyectamos estilos del tema (Input 1)
                             styles.input,

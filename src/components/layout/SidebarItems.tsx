@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import type {NavItem, NavSection} from "@/types/navigationTypes.ts";
+import type { NavItem, NavSection } from "@/types/navigationTypes.ts";
 
 // --- SidebarLink (Items individuales) ---
 // No requiere cambios lógicos, ya cumple con "navegar pero no expandir"
@@ -13,8 +13,8 @@ export const SidebarLink = ({ item, isExpanded }: { item: NavItem; isExpanded: b
                 cn(
                     "flex items-center gap-4 px-4 py-3 text-sm font-semibold transition-all rounded-xl relative group",
                     isActive
-                        ? "bg-blue-600 text-white shadow-md shadow-blue-100"
-                        : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                        ? "bg-primary text-white shadow-soft shadow-primary/30"
+                        : "text-slate-500 hover:bg-primary/5 hover:text-primary"
                 )
             }
         >
@@ -76,7 +76,7 @@ export const SidebarGroup = ({ section, isExpanded, onExpand }: SidebarGroupProp
                 onClick={handleGroupClick}
                 className={cn(
                     "flex w-full items-center px-4 py-3 text-sm font-bold rounded-xl transition-all group relative",
-                    isEffectiveOpen ? "text-blue-600 bg-blue-50/50" : "text-slate-700 hover:bg-slate-50",
+                    isEffectiveOpen ? "text-primary bg-primary/10" : "text-slate-600 hover:bg-slate-50/50 hover:text-slate-900",
                     !isExpanded && "justify-center"
                 )}
             >

@@ -67,7 +67,7 @@ export const MainLayout = () => {
     };
 
     return (
-        <div className="min-h-screen w-full flex bg-[#fcfdfe] relative">
+        <div className="min-h-screen w-full flex bg-transparent relative">
 
             {/* Solo se muestra si es móvil y el menú está abierto */}
             <div
@@ -104,7 +104,7 @@ export const MainLayout = () => {
                 isExpanded ? "lg:ml-[280px]" : "lg:ml-[80px]",
                 "ml-[80px]" // Margen base constante para móvil (para no tapar contenido con la barra mini)
             )}>
-                <TopBar/>
+                <TopBar />
 
                 <main className="flex-1 px-4 sm:px-6 lg:px-8 pb-8">
                     <div className="max-w-7xl mx-auto w-full">

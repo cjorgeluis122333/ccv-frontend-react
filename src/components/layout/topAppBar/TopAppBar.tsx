@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom'; // <--- Importamos Link
 import { LogoutModal } from "@/components/ui/modal/LogoutModal.tsx";
 import { useAuthUser } from '@/hooks/auth/useAuthUser';
-import {useLogout} from "@/hooks/auth/useLogout.ts";
+import { useLogout } from "@/hooks/auth/useLogout.ts";
 
 
 export const TopBar = () => {
@@ -27,7 +27,7 @@ export const TopBar = () => {
             {/* Contenedor flotante - Restaurado al diseño original centrado */}
             <div className="sticky top-4 z-30 w-full flex justify-center px-4 mb-6">
 
-                <header className="w-full max-w-8xl bg-white/90 backdrop-blur-xl border border-slate-200/60 rounded-2xl shadow-sm h-16 flex items-center justify-between px-6 transition-all">
+                <header className="w-full max-w-8xl bg-white/60 backdrop-blur-xl border border-white/50 rounded-2xl shadow-soft h-16 flex items-center justify-between px-6 transition-all">
 
                     {/* --- IZQUIERDA: LOGO + EMPRESA --- */}
                     <div className="flex items-center gap-3">
@@ -45,10 +45,10 @@ export const TopBar = () => {
                             </div>
 
                             <div className="hidden sm:flex flex-col">
-                                <span className="text-lg font-black text-slate-800 tracking-tight leading-none group-hover:text-blue-600 transition-colors">
+                                <span className="text-xl font-display font-black text-slate-800 tracking-widest leading-none group-hover:text-primary transition-colors">
                                     CCV
                                 </span>
-                                <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase leading-none mt-0.5">
+                                <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase leading-none mt-0.5 font-display">
                                     Dashboard
                                 </span>
                             </div>
@@ -60,7 +60,7 @@ export const TopBar = () => {
                         <div className="relative">
                             <button
                                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                                className="flex items-center gap-3 p-1 pl-2 pr-1 rounded-full border border-transparent hover:bg-slate-50 transition-all group"
+                                className="flex items-center gap-3 p-1 pl-2 pr-1 rounded-full border border-transparent hover:bg-primary/5 transition-all group"
                             >
                                 <div className="text-right hidden sm:block">
                                     <p className="text-xs font-bold text-slate-700 leading-none">
@@ -71,7 +71,7 @@ export const TopBar = () => {
                                     </p>
                                 </div>
 
-                                <div className="w-9 h-9 bg-slate-800 text-white rounded-full flex items-center justify-center font-bold shadow-sm ring-2 ring-white group-hover:ring-slate-100 transition-all text-xs">
+                                <div className="w-9 h-9 bg-slate-800 text-white rounded-full flex items-center justify-center font-bold shadow-sm ring-2 ring-transparent group-hover:ring-primary/20 transition-all text-xs font-display">
                                     {getInitials(user?.name)}
                                 </div>
                             </button>
