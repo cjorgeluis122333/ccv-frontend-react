@@ -1,54 +1,30 @@
 // hooks/usePartnerForm.ts
-import { useState, useMemo, useEffect } from 'react';
+import { useState } from 'react';
 import { partnerService } from '../service/partnerService';
 import type { Partner } from '../types/partnerResponseType';
-import {useToast} from "@/contexts/ToastContext.tsx";
+import { useToast } from "@/contexts/ToastContext.tsx";
+import type { PartnerFormValues } from '../schemas/partnerSchema';
 
 export const usePartnerForm = (initialPartner: Partner | null, onSaveSuccess: (partner: Partner) => void) => {
-    const [formData, setFormData] = useState<Partial<Partner>>({});
     const [isSaving, setIsSaving] = useState(false);
-    const [saveStatus, setSaveStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const { showToast } = useToast();
-    // Autolimpiar alertas
-    useEffect(() => {
-        if (saveStatus) {
-            const timer = setTimeout(() => setSaveStatus(null), 3000);
-            return () => clearTimeout(timer);
-        }
-    }, [saveStatus]);
 
-    // NUEVO: Función para forzar la sincronización inmediata
-    const resetForm = (partner: Partner | null) => {
-        setFormData(partner || {});
-        setSaveStatus(null);
-    };
-
-    const handleInputChange = (field: keyof Partner, value: string) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
-    };
-
-    const hasChanges = useMemo(() => {
-        if (!initialPartner) return false;
-        return Object.keys(formData).some((key) => {
-            const k = key as keyof Partner;
-            return (formData[k] || '') !== (initialPartner[k] || '');
-        });
-    }, [formData, initialPartner]);
-
-    const handleSave = async () => { // Renombrado a handleSave para coincidir con tu UI
-        if (!initialPartner || !hasChanges) return;
+    // Ahora recibe directamente la data ya procesada por RHF/Zod
+    const handleSave = async (data: PartnerFormValues) => {
+        if (!initialPartner) return;
         setIsSaving(true);
         try {
-            const updated = await partnerService.update(initialPartner.acc, formData);
-           // Update partner
-            setSaveStatus({ type: 'success', message: 'Datos actualizados correctamente' });
-            onSaveSuccess(updated); // Pasamos el actualizado
-            // Show toast
-            showToast(`¡El socio a sido modificado correctamente!`, 'success');
+            const mappedData: Partial<Partner> = {
+                ...data,
+                cedula: Number(data.cedula)
+            };
+
+            // Se le envían los datos validados al backend
+            const updated = await partnerService.update(initialPartner.acc, mappedData);
+            onSaveSuccess(updated);
+            showToast("¡El socio ha sido modificado correctamente!", 'success');
             return updated;
         } catch (error) {
-            setSaveStatus({ type: 'error', message: 'Error al actualizar los datos' });
-            // Si tu backend devuelve mensajes de error, podrías usar: error.response?.data?.message || errorMsg
             showToast("Error al actualizar los datos", 'error');
             throw error;
         } finally {
@@ -56,6 +32,5 @@ export const usePartnerForm = (initialPartner: Partner | null, onSaveSuccess: (p
         }
     };
 
-    // Exportamos resetForm y setSaveStatus
-    return { formData, setFormData, handleInputChange, hasChanges, isSaving, saveStatus, handleSave, resetForm };
+    return { isSaving, handleSave };
 };

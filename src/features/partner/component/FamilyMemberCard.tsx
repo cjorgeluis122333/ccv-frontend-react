@@ -1,57 +1,77 @@
 // Tarjeta para Familiar (Editable)
-import type {FamilyMember} from "@/features/partner/types/partnerResponseType.ts";
-import {useEffect, useMemo, useState} from "react";
-import {partnerService} from "@/features/partner/service/partnerService.ts";
-import {INPUT_THEMES} from "@/utils/inputTheme.ts";
-import {InputSelectedOption} from "@/components/input/InputSelectedOption.tsx";
-import {InputField} from "@/components/input/InputField.tsx";
-import {useToast} from "@/contexts/ToastContext.tsx";
+import type { FamilyMember } from "@/features/partner/types/partnerResponseType.ts";
+import { useEffect } from "react";
+import { partnerService } from "@/features/partner/service/partnerService.ts";
+import { INPUT_THEMES } from "@/utils/inputTheme.ts";
+import { useToast } from "@/contexts/ToastContext.tsx";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { familiarSchema, type FamiliarFormValues } from "../schemas/familiarSchema.ts";
+import { SmartInput } from "@/components/input/SmartInput.tsx";
+import { InputSelectedOption } from "@/components/input/InputSelectedOption.tsx";
 
-export const FamilyMemberCard = ({member, number}: { member: FamilyMember, number: number }) => {
-    const [formData, setFormData] = useState<Partial<FamilyMember>>(member);
-    const [isSaving, setIsSaving] = useState(false);
-    const {showToast} = useToast();
+export const FamilyMemberCard = ({ member, number }: { member: FamilyMember, number: number }) => {
+    const { showToast } = useToast();
 
-    // Sincronizar si cambia el miembro (por ej., al seleccionar otro titular diferente)
+    // 1. Configuramos react-hook-form con Zod
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors, isDirty, isSubmitting }
+    } = useForm<FamiliarFormValues>({
+        resolver: zodResolver(familiarSchema),
+        defaultValues: {
+            // Transformamos member() a los defaults para RHF
+            nombre: member.nombre || '',
+            cedula: String(member.cedula || ''), // el Schema espera string para regex
+            carnet: member.carnet || '',
+            celular: member.celular || '',
+            telefono: member.telefono || '',
+            direccion: member.direccion || '',
+            nacimiento: member.nacimiento || '',
+        }
+    });
+
+    // 2. Sincronizar si cambia el miembro externo (ej: al cargar otro socio titular)
     useEffect(() => {
-        setFormData(member);
-    }, [member]);
-
-
-    const handleInputChange = (field: keyof FamilyMember, value: string) => {
-        setFormData(prev => ({
-            ...prev,
-            [field]: value
-        }));
-    };
-
-    const hasChanges = useMemo(() => {
-        return Object.keys(formData).some((key) => {
-            const k = key as keyof FamilyMember;
-            const formVal = formData[k] === null || formData[k] === undefined ? '' : formData[k].toString();
-            const originalVal = member[k] === null || member[k] === undefined ? '' : member[k].toString();
-            return formVal !== originalVal;
+        reset({
+            nombre: member.nombre || '',
+            cedula: String(member.cedula || ''),
+            carnet: member.carnet || '',
+            celular: member.celular || '',
+            telefono: member.telefono || '',
+            direccion: member.direccion || '',
+            nacimiento: member.nacimiento || '',
         });
-    }, [formData, member]);
+    }, [member, reset]);
 
-    const updateFamily = async () => {
-        if (!hasChanges) return;
-        setIsSaving(true);
-
+    const onSubmit = async (data: FamiliarFormValues) => {
+        if (!isDirty) return;
         try {
-            await partnerService.updateFamily(member.ind, formData);
+            // Transformamos datos de vuelta al formato del backend si es necesario
+            const mappedData: Partial<FamilyMember> = {
+                ...data,
+                cedula: Number(data.cedula)
+            };
+
+            // El backend acepta la data gracias a nuestra lógica previa
+            await partnerService.updateFamily(member.ind, mappedData);
+
+            // Refrescamos los valores en RHF para que vuelva a su estado initial (!isDirty)
+            reset(data);
             showToast(`¡Familiar actualizado!`, 'success');
         } catch (error) {
             console.error("Error al actualizar familiar:", error);
             showToast('Error de actualización', 'error');
-        } finally {
-            setIsSaving(false);
         }
     };
 
     return (
-        <div
-            className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:border-fuchsia-200 hover:shadow-md transition-all duration-300 group">
+        <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:border-fuchsia-200 hover:shadow-md transition-all duration-300 group"
+        >
             {/* Cabecera del familiar editable */}
             <div
                 className="px-5 py-3.5 border-b border-slate-100 bg-slate-50/50 flex flex-col xl:flex-row xl:items-center justify-between gap-4 group-hover:bg-fuchsia-50/30 transition-colors">
@@ -60,23 +80,23 @@ export const FamilyMemberCard = ({member, number}: { member: FamilyMember, numbe
                         className="flex items-center justify-center w-8 h-8 rounded-full bg-white border border-slate-200 text-xs font-black text-slate-500 shadow-sm">
                         {number}
                     </span>
-                    <h3 className="font-bold text-slate-800 text-base">{formData.nombre || 'Sin nombre registrado'}</h3>
+                    <h3 className="font-bold text-slate-800 text-base">{member.nombre || 'Sin nombre registrado'}</h3>
                     <span
                         className="px-3 py-1 bg-fuchsia-100 text-fuchsia-700 rounded-full text-[10px] font-black tracking-widest uppercase border border-fuchsia-200 flex-shrink-0">
-                        {formData.direccion || 'Familiar'}
+                        {member.direccion || 'Familiar'}
                     </span>
                 </div>
 
                 <div className="flex items-center gap-3 self-end xl:self-auto">
                     <button
-                        onClick={updateFamily}
-                        disabled={!hasChanges || isSaving}
+                        type="submit"
+                        disabled={!isDirty || isSubmitting}
                         className={`flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg font-bold text-xs shadow-sm transition-all
-                            ${!hasChanges
-                            ? 'bg-slate-100 text-slate-400 cursor-not-allowed hidden xl:flex'
-                            : 'bg-fuchsia-600 text-white hover:bg-fuchsia-700 hover:shadow-md active:scale-95'}`}
+                            ${!isDirty
+                                ? 'bg-slate-100 text-slate-400 cursor-not-allowed hidden xl:flex'
+                                : 'bg-fuchsia-600 text-white hover:bg-fuchsia-700 hover:shadow-md active:scale-95'}`}
                     >
-                        {isSaving ? (
+                        {isSubmitting ? (
                             <span className="material-symbols-rounded text-sm animate-spin">progress_activity</span>
                         ) : (
                             <span className="material-symbols-rounded text-sm">save</span>
@@ -89,29 +109,67 @@ export const FamilyMemberCard = ({member, number}: { member: FamilyMember, numbe
             {/* Formulario del familiar */}
             <div className="p-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-5 gap-y-4">
-                    <InputField label="Nombre Completo" field="nombre" value={formData.nombre}
-                                onChange={handleInputChange} icon="person" styles={INPUT_THEMES.fuchsia}/>
-                    <InputField label="Cédula" field="cedula" value={formData.cedula} onChange={handleInputChange}
-                                icon="badge" type="number" styles={INPUT_THEMES.fuchsia}/>
-                    <InputField label="Carnet" field="carnet" value={formData.carnet} onChange={handleInputChange}
-                                icon="id_card" styles={INPUT_THEMES.fuchsia}/>
-                    <InputField label="Celular" field="celular" value={formData.celular} onChange={handleInputChange}
-                                icon="smartphone" styles={INPUT_THEMES.fuchsia}/>
-                    <InputSelectedOption<FamilyMember>
-                        label="Teléfono"
-                        field="telefono"
-                        value={formData.telefono}
-                        onChange={handleInputChange}
-                        icon="call"
-                        options={[{label: 'Sí', value: 'SI'}, {label: 'No', value: 'NO'}]}
+                    <SmartInput
+                        label="Nombre Completo"
+                        {...register('nombre')}
+                        error={errors.nombre?.message}
+                        icon="person"
                         styles={INPUT_THEMES.fuchsia}
                     />
-                    <InputField label="Parentesco/Dirección" field="direccion" value={formData.direccion}
-                                onChange={handleInputChange} icon="family_restroom" styles={INPUT_THEMES.fuchsia}/>
-                    <InputField label="Nacimiento" field="nacimiento" value={formData.nacimiento}
-                                onChange={handleInputChange} icon="cake" type="date" styles={INPUT_THEMES.fuchsia}/>
+
+                    <SmartInput
+                        label="Cédula"
+                        type="number"
+                        {...register('cedula')}
+                        error={errors.cedula?.message}
+                        icon="badge"
+                        styles={INPUT_THEMES.fuchsia}
+                    />
+
+                    <SmartInput
+                        label="Carnet"
+                        {...register('carnet')}
+                        error={errors.carnet?.message}
+                        icon="id_card"
+                        styles={INPUT_THEMES.fuchsia}
+                    />
+
+                    <SmartInput
+                        label="Celular"
+                        type="tel"
+                        {...register('celular')}
+                        error={errors.celular?.message}
+                        icon="smartphone"
+                        styles={INPUT_THEMES.fuchsia}
+                    />
+
+                    <InputSelectedOption
+                        label="Teléfono"
+                        {...register('telefono')}
+                        error={errors.telefono?.message}
+                        icon="call"
+                        options={[{ label: 'Sí', value: 'SI' }, { label: 'No', value: 'NO' }]}
+                        styles={INPUT_THEMES.fuchsia}
+                    />
+
+                    <SmartInput
+                        label="Parentesco/Dirección"
+                        {...register('direccion')}
+                        error={errors.direccion?.message}
+                        icon="family_restroom"
+                        styles={INPUT_THEMES.fuchsia}
+                    />
+
+                    <SmartInput
+                        label="Nacimiento (YYYY-MM-DD)"
+                        type="date"
+                        {...register('nacimiento')}
+                        error={errors.nacimiento?.message}
+                        icon="cake"
+                        styles={INPUT_THEMES.fuchsia}
+                    />
                 </div>
             </div>
-        </div>
+        </form>
     );
 };

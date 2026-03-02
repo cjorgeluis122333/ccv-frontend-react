@@ -1,18 +1,20 @@
-import {useState} from 'react';
-import {usePartners} from '../hooks/usePartners';
-import type {FamilyMember, Partner} from '../types/partnerResponseType';
-import {partnerService} from '../service/partnerService';
-import {usePartnerForm} from "@/features/partner/hooks/usePartnerForm.ts";
-import {FamilyMemberCard} from "@/features/partner/component/FamilyMemberCard.tsx";
-import {InputSearch} from "@/components/input/InputSearch.tsx";
-import {useSearchGeneric} from "@/hooks/search/useSearchPartner.ts";
-import {useGenericFilter} from "@/hooks/search/useGenericFilter.ts";
-import {InputField} from "@/components/input/InputField.tsx";
-
+import { useState } from 'react';
+import { usePartners } from '../hooks/usePartners';
+import type { FamilyMember, Partner } from '../types/partnerResponseType';
+import { partnerService } from '../service/partnerService';
+import { usePartnerForm } from "@/features/partner/hooks/usePartnerForm.ts";
+import { FamilyMemberCard } from "@/features/partner/component/FamilyMemberCard.tsx";
+import { InputSearch } from "@/components/input/InputSearch.tsx";
+import { useSearchGeneric } from "@/hooks/search/useSearchPartner.ts";
+import { useGenericFilter } from "@/hooks/search/useGenericFilter.ts";
+import { SmartInput } from "@/components/input/SmartInput.tsx";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { partnerSchema, type PartnerFormValues } from "../schemas/partnerSchema";
 
 export const PartnerDataScreen = () => {
     // 1. Estado Global y del Dominio
-    const {partners: allPartners, searchTerm, setSearchTerm, isLoading, refresh} = usePartners();
+    const { partners: allPartners, searchTerm, setSearchTerm, isLoading, refresh } = usePartners();
 
     // 2. Estado Local del Componente
     const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
@@ -32,7 +34,7 @@ export const PartnerDataScreen = () => {
     });
 
     // 4. Usamos el Hook Genérico de Filtrado
-    const {filteredItems, isFiltering} = useGenericFilter<Partner>({
+    const { filteredItems, isFiltering } = useGenericFilter<Partner>({
         items: allPartners,
         searchTerm: searchTerm,
         filterFn: (p, term) => {
@@ -43,25 +45,62 @@ export const PartnerDataScreen = () => {
         }
     });
 
-    // Hook para manejar el formulario de los socios
+    // 5. Configurar React Hook form 
     const {
-        formData,
-        isSaving,
-        saveStatus,
-        hasChanges,
-        handleInputChange,
-        handleSave,
-        resetForm
-    } = usePartnerForm(selectedPartner, (updatedPartner) => {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors, isDirty, isSubmitting }
+    } = useForm<PartnerFormValues>({
+        resolver: zodResolver(partnerSchema) as any,
+        defaultValues: {
+            acc: 0,
+            cedula: '',
+            carnet: '',
+            nombre: '',
+            celular: '',
+            telefono: '',
+            correo: '',
+            direccion: '',
+            nacimiento: '',
+            ingreso: '',
+            ocupacion: '',
+            cobrador: ''
+        }
+    });
+
+    // Hook simplificado para manejar la llamada HTTP de los socios
+    const { isSaving, handleSave } = usePartnerForm(selectedPartner, (updatedPartner) => {
         setSelectedPartner(updatedPartner);
-        resetForm(updatedPartner); // Sincronizamos tras guardar
         refresh();
     });
+
+    const onSubmitPartner = async (data: PartnerFormValues) => {
+        const result = await handleSave(data);
+        // Volvemos el estado isDirty a falso pasando de nuevo la data validada
+        if (result) reset(data);
+    };
 
     // Select partner
     const handleSelectPartner = async (partner: Partner) => {
         setSelectedPartner(partner);
-        resetForm(partner); // <--- Actualiza el formulario al instante
+
+        // Sincroniza velozmente React Hook Form
+        reset({
+            acc: Number(partner.acc),
+            cedula: String(partner.cedula || ''),
+            carnet: partner.carnet || '',
+            nombre: partner.nombre || '',
+            celular: partner.celular || '',
+            telefono: partner.telefono || '',
+            correo: partner.correo || '',
+            direccion: partner.direccion || '',
+            nacimiento: partner.nacimiento || '',
+            ingreso: partner.ingreso || '',
+            ocupacion: partner.ocupacion || '',
+            cobrador: partner.cobrador || ''
+        });
+
         setSearchTerm(partner.nombre);
         setIsDropdownOpen(false);
 
@@ -76,6 +115,7 @@ export const PartnerDataScreen = () => {
             setIsLoadingFamily(false);
         }
     };
+
     return (
         <div
             className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full max-w-5xl mx-auto pb-12">
@@ -96,17 +136,6 @@ export const PartnerDataScreen = () => {
                     </div>
                 </div>
             </div>
-
-            {saveStatus && (
-                <div className={`p-4 rounded-xl text-sm font-medium border flex items-center gap-3 animate-in slide-in-from-top-2
-                    ${saveStatus.type === 'success' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-red-50 text-red-600 border-red-100'}`}
-                >
-                    <span className="material-symbols-rounded">
-                        {saveStatus.type === 'success' ? 'check_circle' : 'error'}
-                    </span>
-                    {saveStatus.message}
-                </div>
-            )}
 
             {/* Búsqueda */}
             <InputSearch<Partner>
@@ -141,18 +170,21 @@ export const PartnerDataScreen = () => {
                 )}
             />
 
+
             {selectedPartner && (
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-500">
 
                     {/* Tarjeta del Titular */}
-                    <div
-                        className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+                    <form
+                        onSubmit={handleSubmit(onSubmitPartner)}
+                        className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col"
+                    >
                         <div className="p-6 border-b border-slate-100 bg-slate-50/80 flex justify-between items-center">
                             <h2 className="text-lg font-black text-slate-800 flex items-center gap-2">
                                 <span className="material-symbols-rounded text-indigo-500">person</span>
                                 Información del Titular
                             </h2>
-                            {hasChanges && (
+                            {isDirty && (
                                 <span
                                     className="text-xs font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200 flex items-center gap-1 animate-pulse">
                                     <span className="material-symbols-rounded text-[14px]">edit</span>
@@ -170,7 +202,7 @@ export const PartnerDataScreen = () => {
                                         <span
                                             className="material-symbols-rounded text-7xl text-slate-200 group-hover:scale-110 transition-transform duration-300">account_circle</span>
                                         <div
-                                            className="absolute inset-0 bg-indigo-500/0 group-hover:bg-indigo-500/5 transition-colors duration-300"/>
+                                            className="absolute inset-0 bg-indigo-500/0 group-hover:bg-indigo-500/5 transition-colors duration-300" />
                                     </div>
                                     <span
                                         className="text-xs font-bold text-slate-500 uppercase tracking-wider bg-slate-100 px-4 py-1.5 rounded-full border border-slate-200 shadow-sm">
@@ -187,43 +219,91 @@ export const PartnerDataScreen = () => {
                                         </label>
                                         <div
                                             className="px-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-slate-500 font-semibold text-sm h-[46px] flex items-center shadow-inner select-none cursor-not-allowed">
-                                            {formData.acc}
+                                            {selectedPartner.acc}
                                         </div>
                                     </div>
 
-
-                                    <InputField label="Cédula" field="cedula" value={formData.cedula || ''}
-                                                onChange={handleInputChange} icon="badge" type="number"/>
-                                    <InputField label="Carnet" field="carnet" value={formData.carnet || ''}
-                                                onChange={handleInputChange} icon="id_card"/>
-
-                                    <div className="sm:col-span-2 lg:col-span-3">
-                                        <InputField label="Nombre Completo" field="nombre" value={formData.nombre || ''}
-                                                    onChange={handleInputChange} icon="person"/>
-                                    </div>
-
-                                    <InputField label="Celular" field="celular" value={formData.celular || ''}
-                                                onChange={handleInputChange} icon="phone_iphone"/>
-                                    <InputField label="Teléfono" field="telefono" value={formData.telefono || ''}
-                                                onChange={handleInputChange} icon="call"/>
-                                    <InputField label="Correo Electrónico" field="correo" value={formData.correo || ''}
-                                                onChange={handleInputChange} icon="mail" type="email"/>
+                                    <SmartInput
+                                        label="Cédula"
+                                        type="number"
+                                        error={errors.cedula?.message}
+                                        {...register('cedula')}
+                                        icon="badge"
+                                    />
+                                    <SmartInput
+                                        label="Carnet"
+                                        error={errors.carnet?.message}
+                                        {...register('carnet')}
+                                        icon="id_card"
+                                    />
 
                                     <div className="sm:col-span-2 lg:col-span-3">
-                                        <InputField label="Dirección" field="direccion" value={formData.direccion || ''}
-                                                    onChange={handleInputChange} icon="location_on"/>
+                                        <SmartInput
+                                            label="Nombre Completo"
+                                            error={errors.nombre?.message}
+                                            {...register('nombre')}
+                                            icon="person"
+                                        />
                                     </div>
 
-                                    <InputField label="Fecha Nacimiento" field="nacimiento"
-                                                value={formData.nacimiento || ''} onChange={handleInputChange}
-                                                icon="cake" type="date"/>
-                                    <InputField label="Fecha Ingreso" field="ingreso" value={formData.ingreso || ''}
-                                                onChange={handleInputChange} icon="calendar_month" type="date"/>
-                                    <InputField label="Ocupación" field="ocupacion" value={formData.ocupacion || ''}
-                                                onChange={handleInputChange} icon="work"/>
+                                    <SmartInput
+                                        label="Celular"
+                                        type="tel"
+                                        error={errors.celular?.message}
+                                        {...register('celular')}
+                                        icon="phone_iphone"
+                                    />
+                                    <SmartInput
+                                        label="Teléfono"
+                                        type="tel"
+                                        error={errors.telefono?.message}
+                                        {...register('telefono')}
+                                        icon="call"
+                                    />
+                                    <SmartInput
+                                        label="Correo Electrónico"
+                                        type="email"
+                                        error={errors.correo?.message}
+                                        {...register('correo')}
+                                        icon="mail"
+                                    />
 
-                                    <InputField label="Cobrador" field="cobrador" value={formData.cobrador || ''}
-                                                onChange={handleInputChange} icon="account_balance_wallet"/>
+                                    <div className="sm:col-span-2 lg:col-span-3">
+                                        <SmartInput
+                                            label="Dirección"
+                                            error={errors.direccion?.message}
+                                            {...register('direccion')}
+                                            icon="location_on"
+                                        />
+                                    </div>
+
+                                    <SmartInput
+                                        label="Fecha Nacimiento"
+                                        type="date"
+                                        error={errors.nacimiento?.message}
+                                        {...register('nacimiento')}
+                                        icon="cake"
+                                    />
+                                    <SmartInput
+                                        label="Fecha Ingreso"
+                                        type="date"
+                                        error={errors.ingreso?.message}
+                                        {...register('ingreso')}
+                                        icon="calendar_month"
+                                    />
+                                    <SmartInput
+                                        label="Ocupación"
+                                        error={errors.ocupacion?.message}
+                                        {...register('ocupacion')}
+                                        icon="work"
+                                    />
+
+                                    <SmartInput
+                                        label="Cobrador"
+                                        error={errors.cobrador?.message}
+                                        {...register('cobrador')}
+                                        icon="account_balance_wallet"
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -231,23 +311,23 @@ export const PartnerDataScreen = () => {
                         {/* Footer Titular con el Botón Guardar */}
                         <div className="border-t border-slate-100 bg-slate-50/50 p-6 flex justify-end">
                             <button
-                                onClick={handleSave}
-                                disabled={!hasChanges || isSaving || !selectedPartner}
+                                type="submit"
+                                disabled={!isDirty || isSaving || !selectedPartner}
                                 className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm shadow-sm transition-all
-                                    ${!selectedPartner || !hasChanges
-                                    ? 'bg-slate-200 text-slate-400 cursor-not-allowed hidden md:flex'
-                                    : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-md active:scale-95'}`}
+                                    ${!selectedPartner || !isDirty
+                                        ? 'bg-slate-200 text-slate-400 cursor-not-allowed hidden md:flex'
+                                        : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-md active:scale-95'}`}
                             >
-                                {isSaving ? (
+                                {isSaving || isSubmitting ? (
                                     <span
                                         className="material-symbols-rounded text-xl animate-spin">progress_activity</span>
                                 ) : (
                                     <span className="material-symbols-rounded text-xl">save</span>
                                 )}
-                                <span>{isSaving ? 'Guardando...' : 'Guardar Cambios del Titular'}</span>
+                                <span>{isSaving || isSubmitting ? 'Guardando...' : 'Guardar Cambios del Titular'}</span>
                             </button>
                         </div>
-                    </div>
+                    </form>
 
                     {/* Sección de Familiares */}
                     <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
@@ -285,7 +365,7 @@ export const PartnerDataScreen = () => {
                             ) : (
                                 <div className="space-y-6">
                                     {familyMembers.map((member, index) => (
-                                        <FamilyMemberCard key={member.ind} member={member} number={index + 1}/>
+                                        <FamilyMemberCard key={member.ind} member={member} number={index + 1} />
                                     ))}
                                 </div>
                             )}
