@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const partnerSchema = z.object({
-    acc: z.number().int("Debe ser un número entero"),
+    acc: z.coerce.number().int("Debe ser un número entero"),
     cedula: z.string().min(5, "La cédula debe tener al menos 5 caracteres"),
     carnet: z.string().min(1, "El carnet es requerido"),
     nombre: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
@@ -10,7 +10,7 @@ export const partnerSchema = z.object({
         .min(10, "El celular debe tener 10 dígitos (ej. 0912345678)"),
     telefono: z.string().optional(),
 
-    correo: z.string("eeeee").optional(),
+    correo: z.string().optional(),
 
     direccion: z.string().min(5, "La dirección es muy corta"),
 
@@ -20,7 +20,7 @@ export const partnerSchema = z.object({
     ingreso: z.string().min(1, "La fecha de ingreso es requerida"),
 
     ocupacion: z.string().min(1, "La ocupación es requerida"),
-    cobrador: z.int().min(1, "El cobrador es requerido"),
+    cobrador: z.coerce.number().int().min(1, "El cobrador es requerido"),
 });
 
 export interface PartnerFormInputs extends z.input<typeof partnerSchema> { }
