@@ -62,8 +62,7 @@ export const AddFamilyMemberModal = ({ isOpen, onClose, acc, onSuccess }: AddFam
                 acc,
                 cedula: Number(data.cedula),
                 categoria: 'familiar',
-                cobrador: 0,
-                ind: 0 // Will be assigned by backend
+                cobrador: 0
             };
 
             const newMember = await partnerService.createFamily(mappedData);
