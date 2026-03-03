@@ -50,7 +50,7 @@ export const BoardScreen = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#fafafa] selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden relative">
+        <div className="min-h-screen bg-[#fafafa] selection:bg-blue-100 selection:text-blue-900 relative">
             {/* Ambient Background Elements */}
             <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-blue-50/50 to-transparent pointer-events-none -z-10" />
             <div className="absolute top-[10%] right-[10%] w-[500px] h-[500px] bg-blue-100/20 blur-[120px] rounded-full pointer-events-none -z-10 animate-pulse duration-[10s]" />
@@ -61,14 +61,13 @@ export const BoardScreen = () => {
                     <BoardHeader selectedYear={selectedYear} />
                 </div>
 
-                <div className="flex justify-center mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 fill-mode-both">
+                <div ref={gridRef} className="mb-3 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 fill-mode-both scroll-mt-6">
                     <YearSelector
                         years={availableYears}
                         selectedYear={selectedYear}
                         onSelectYear={setSelectedYear}
                     />
                 </div>
-                <div ref={gridRef} className="scroll-mt-24" />
                 <div className="relative">
                     {selectedBoard ? (
                         <div className="animate-in fade-in zoom-in-95 duration-700 delay-500 fill-mode-both">
