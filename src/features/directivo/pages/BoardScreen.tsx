@@ -3,6 +3,7 @@ import { useBoard } from "../hooks/useBoard";
 import { YearSelector } from "../component/YearSelector";
 import { BoardMemberGrid } from "../component/BoardMemberGrid";
 import { BoardHeader } from "@/features/directivo/component/BoardHeader.tsx";
+import { GenericLoader } from "@/components/loading/GenericLoader";
 
 export const BoardScreen = () => {
     const {
@@ -32,11 +33,7 @@ export const BoardScreen = () => {
 
 
     if (loading) {
-        return (
-            <div className="flex items-center justify-center p-12">
-                <span className="material-symbols-rounded animate-spin text-4xl text-blue-600">progress_activity</span>
-            </div>
-        );
+        return <GenericLoader message="Cargando Directiva..." />;
     }
 
     if (error) {
