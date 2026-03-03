@@ -56,7 +56,7 @@ export const BoardScreen = () => {
             <div className="absolute top-[10%] right-[10%] w-[500px] h-[500px] bg-blue-100/20 blur-[120px] rounded-full pointer-events-none -z-10 animate-pulse duration-[10s]" />
             <div className="absolute top-[20%] left-[5%] w-[400px] h-[400px] bg-indigo-50/30 blur-[100px] rounded-full pointer-events-none -z-10 anim-delay-2000" />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 pt-12 pb-24 relative z-10">
+            <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 pt-6 pb-12 relative z-10">
                 <div className="animate-in fade-in slide-in-from-bottom-8 duration-1000 ease-out">
                     <BoardHeader selectedYear={selectedYear} />
                 </div>
