@@ -2,7 +2,7 @@
 
 // --- Configuración de Datos ---
 
-import type {NavItem, NavSection} from "@/types/navigationTypes.ts";
+import type { NavItem, NavSection } from "@/types/navigationTypes.ts";
 
 export const menuSections: NavSection[] = [
     {
@@ -31,10 +31,10 @@ export const menuSections: NavSection[] = [
                 color: "text-indigo-600 bg-indigo-50"
             },
             {
-                title: "Ventas",
+                title: "Contabilidad",
                 path: "/ventas",
                 icon: "payments",
-                description: "Registro de ventas diarias",
+                description: "Registro de contabilidad",
                 color: "text-cyan-600 bg-cyan-50"
             }
         ]

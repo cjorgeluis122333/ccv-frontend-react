@@ -5,6 +5,7 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { Dashboard } from "@/features/dashboard/component/DashboardScreen.tsx";
 import { PartnersList } from '@/features/partner/pages/PartnersList';
 import { PartnerDataScreen } from '@/features/partner/pages/PartnerDataScreen';
+import { BoardScreen } from '@/features/directivo/pages/BoardScreen';
 
 export const AppRouter = () => {
     return (
@@ -30,7 +31,7 @@ export const AppRouter = () => {
                 {/* Socios */}
                 <Route path="/socios/datos" element={<PartnerDataScreen />} />
                 <Route path="/socios/lista" element={<PartnersList />} />
-                <Route path="/socios/directivos" element={<div>Directivos</div>} />
+                <Route path="/socios/directivos" element={<BoardScreen />} />
 
                 {/* Generales */}
                 <Route path="/invitados" element={<div>Gestión de Invitados</div>} />

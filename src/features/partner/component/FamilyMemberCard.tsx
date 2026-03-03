@@ -52,7 +52,7 @@ export const FamilyMemberCard = ({ member, number }: { member: FamilyMember, num
             // Transformamos datos de vuelta al formato del backend si es necesario
             const mappedData: Partial<FamilyMember> = {
                 ...data,
-                cedula: Number(data.cedula)
+                cedula: data.cedula ? Number(data.cedula) : null as unknown as number
             };
 
             // El backend acepta la data gracias a nuestra lógica previa
