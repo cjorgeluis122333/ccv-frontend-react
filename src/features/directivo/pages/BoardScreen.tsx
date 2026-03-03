@@ -61,7 +61,7 @@ export const BoardScreen = () => {
                     <BoardHeader selectedYear={selectedYear} />
                 </div>
 
-                <div ref={gridRef} className="mb-3 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 fill-mode-both scroll-mt-6">
+                <div ref={gridRef} className="mb-3 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 fill-mode-both scroll-mt-28">
                     <YearSelector
                         years={availableYears}
                         selectedYear={selectedYear}

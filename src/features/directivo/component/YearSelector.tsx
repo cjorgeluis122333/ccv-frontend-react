@@ -41,12 +41,12 @@ export const YearSelector = ({ years, selectedYear, onSelectYear }: YearSelector
                     <button
                         key={year}
                         onClick={() => onSelectYear(year)}
-                        className={`px-5 py-2 rounded-xl font-black text-sm transition-all border-2 flex items-center gap-2 shrink-0 ${selectedYear === year
-                                ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-200 scale-105"
-                                : "bg-white/80 text-slate-500 border-slate-100 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+                        className={`px-3 py-1.5 sm:px-5 sm:py-2 rounded-xl font-black text-xs sm:text-sm transition-all border-2 flex items-center gap-1.5 sm:gap-2 shrink-0 ${selectedYear === year
+                            ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-200 scale-105"
+                            : "bg-white/80 text-slate-500 border-slate-100 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
                             }`}
                     >
-                        <span className="material-symbols-rounded text-base">calendar_today</span>
+                        <span className="material-symbols-rounded text-sm sm:text-base">calendar_today</span>
                         {year} - {year + 1}
                     </button>
                 ))}
