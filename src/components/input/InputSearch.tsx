@@ -23,7 +23,8 @@ export const InputSearch = <T,>({
     searchTerm,
     onSearchChange,
     onFocus,
-    isFiltering = false, // Por defecto falso
+    isLoading = false,
+    isFiltering = false,
     isDropdownOpen,
     items,
     onSelectItem,
@@ -58,8 +59,8 @@ export const InputSearch = <T,>({
                 <div
                     className="absolute z-50 w-[calc(100%-3rem)] mt-2 bg-white border border-slate-200 rounded-xl shadow-2xl max-h-72 overflow-y-auto divide-y divide-slate-100">
 
-                    {isFiltering ? (
-                        /* EFECTO SHIMMER (Loading) */
+                    {isFiltering || isLoading ? (
+                        /* EFECTO SHIMMER (Debounce activo O API cargando) */
                         <ShimmerList count={4} />
 
                     ) : items.length > 0 ? (
