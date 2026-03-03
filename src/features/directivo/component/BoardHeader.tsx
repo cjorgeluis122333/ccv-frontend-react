@@ -1,4 +1,4 @@
-interface  BoardHeaderType {
+interface BoardHeaderType {
     selectedYear: number | null;
 }
 
@@ -6,7 +6,7 @@ interface  BoardHeaderType {
  * Componente funcional para el encabezado con banderas.
  * Recibe el año seleccionado y muestra el período correspondiente.
  */
-export const BoardHeader = ({ selectedYear }:BoardHeaderType) => {
+export const BoardHeader = ({ selectedYear }: BoardHeaderType) => {
     const periodText = selectedYear ? `${selectedYear} - ${selectedYear + 1}` : "...";
 
     return (
