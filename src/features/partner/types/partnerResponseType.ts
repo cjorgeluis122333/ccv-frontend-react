@@ -11,7 +11,7 @@ export interface Partner {
     ingreso?: string;
     ocupacion?: string;
     categoria?: string;
-    cobrador?: string;
+    cobrador?: number;
 }
 
 export interface PartnerQueryParams {
