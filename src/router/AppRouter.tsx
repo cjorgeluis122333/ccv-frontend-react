@@ -6,6 +6,7 @@ import { Dashboard } from "@/features/dashboard/component/DashboardScreen.tsx";
 import { PartnersList } from '@/features/partner/pages/PartnersList';
 import { PartnerDataScreen } from '@/features/partner/pages/PartnerDataScreen';
 import { BoardScreen } from '@/features/directivo/pages/BoardScreen';
+import { PaymentScreen } from '@/features/payment/pages/PaymentScreen';
 
 export const AppRouter = () => {
     return (
@@ -19,7 +20,8 @@ export const AppRouter = () => {
                 <Route path="/dashboard" element={<Dashboard />} />
 
                 {/* Pagos */}
-                <Route path="/pagos" element={<div>Pantalla de Pagos</div>} />
+                <Route path="/pago" element={<PaymentScreen />} />
+                <Route path="/pagos" element={<PaymentScreen />} />
                 <Route path="/operaciones" element={<div>Pantalla de Operaciones</div>} />
                 <Route path="/reportes" element={<div>Pantalla de Reportes</div>} />
                 <Route path="/ventas" element={<div>Pantalla de Ventas</div>} />
