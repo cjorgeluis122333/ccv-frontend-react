@@ -63,6 +63,13 @@ export const PaymentForm = ({
     const isMultiSelection = selectedDebts.length > 1;
     const isSingleSelection = selectedDebts.length === 1;
 
+    // Formateo de fechas para el select (coma y puntos suspensivos)
+    const sortedSelectedDebts = [...selectedDebts].sort((a, b) => b.mes.localeCompare(a.mes));
+    const formattedDates = selectedDebts.map(d => d.mes).join(', ');
+    const displayDates = formattedDates.length > 35 
+        ? formattedDates.substring(0, 32) + '...' 
+        : formattedDates;
+
     // Sync form values when debt selection changes
     useEffect(() => {
         if (hasSelection) {
@@ -152,11 +159,11 @@ export const PaymentForm = ({
                                 Fechas Seleccionadas
                             </label>
                             <select 
-                                disabled
-                                className="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-sm font-bold text-slate-600 focus:outline-none focus:ring-4 cursor-not-allowed"
+                                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer"
+                                defaultValue="summary"
                             >
-                                <option>Varios Meses Seleccionados</option>
-                                {selectedDebts.map(d => (
+                                <option value="summary">{displayDates}</option>
+                                {sortedSelectedDebts.map(d => (
                                     <option key={d.mes} value={d.mes}>{d.mes}</option>
                                 ))}
                             </select>
