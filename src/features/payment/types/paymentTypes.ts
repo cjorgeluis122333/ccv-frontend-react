@@ -7,6 +7,7 @@ export interface PartnerInfo {
 export interface Debt {
     mes: string;
     cuota_aplicada: number;
+    impuesto: number;
     total_pagado: number;
     deuda_pendiente: number;
     efectivo_restante: number;

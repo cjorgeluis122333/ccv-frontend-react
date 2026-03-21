@@ -8,6 +8,7 @@ interface PaymentFormProps {
     totalSelectedAmount: number;
     descriptionFromSelection: string;
     hasSelection: boolean;
+    selectedDebts: { mes: string, impuesto?: number }[];
     calculateDistribution: (monto: number) => { abono: number };
     onSubmit: (data: PaymentFormValues) => void;
     isSubmitting: boolean;
@@ -18,6 +19,7 @@ export const PaymentForm = ({
     totalSelectedAmount,
     descriptionFromSelection,
     hasSelection,
+    selectedDebts,
     calculateDistribution,
     onSubmit,
     isSubmitting,
@@ -33,7 +35,6 @@ export const PaymentForm = ({
     } = useForm<PaymentFormValues>({
         resolver: zodResolver(paymentSchema),
         defaultValues: {
-            monto_total: 0,
             monto_pagado: 0,
             operacion: "pago",
             descripcion: "",
@@ -47,18 +48,39 @@ export const PaymentForm = ({
     const montoPagadoValue = watch("monto_pagado") || 0;
     const { abono: calculatedAbono } = calculateDistribution(montoPagadoValue);
 
+    // Calculo de Sub-Total e Impuesto (tomamos el del primer mes)
+    const impuesto = selectedDebts.length > 0 ? (selectedDebts[0].impuesto || 16) : 16;
+    const subTotalVisual = montoPagadoValue / (1 + (impuesto / 100));
+    
+    // Calculo de Monto Total según operación
+    // Si la operación es pago, Monto Total = Monto Pagado * 1. Si es descuento, pendiente pero lo dejamos igual por ahora.
+    let montoTotalVisual = montoPagadoValue;
+    if (operacionValue === 'descuento') {
+        montoTotalVisual = montoPagadoValue; // Implementar suma de PENDIENTE en un futuro
+    }
+
+    // Calculo dinámico de Fechas Seleccionadas
+    const isMultiSelection = selectedDebts.length > 1;
+    const isSingleSelection = selectedDebts.length === 1;
+
     // Sync form values when debt selection changes
     useEffect(() => {
         if (hasSelection) {
-            setValue("monto_total", totalSelectedAmount);
             setValue("monto_pagado", totalSelectedAmount);
             setValue("descripcion", descriptionFromSelection);
+            
+            // Set first date to avoid validation errors, but we will block the original input
+            if (isSingleSelection) {
+                setValue("fecha_pago", selectedDebts[0].mes);
+            } else {
+                setValue("fecha_pago", selectedDebts[0].mes); // fallback para Zod, la UI mostrará otra cosa
+            }
+            
         } else {
-            setValue("monto_total", 0);
             setValue("monto_pagado", 0);
             setValue("descripcion", "");
         }
-    }, [hasSelection, totalSelectedAmount, descriptionFromSelection, setValue]);
+    }, [hasSelection, totalSelectedAmount, descriptionFromSelection, isSingleSelection, selectedDebts, setValue]);
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col h-full">
@@ -73,23 +95,29 @@ export const PaymentForm = ({
                 
                 {/* Módulo de Montos */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                    <SmartInput
-                        label="Sub-Total"
-                        type="number"
-                        step="0.01"
-                        disabled
-                        value={totalSelectedAmount}
-                        icon="calculate"
-                    />
-                    <SmartInput
-                        label="Monto Total"
-                        type="number"
-                        step="0.01"
-                        error={errors.monto_total?.message}
-                        disabled={hasSelection} // Si selecciona del historial, se bloquea (se actualiza solo)
-                        {...register('monto_total', { valueAsNumber: true })}
-                        icon="attach_money"
-                    />
+                    
+                    {/* Visual Sub-Total */}
+                    <div className="space-y-1.5 group">
+                        <label className="text-[11px] font-bold text-slate-400 flex items-center gap-1.5 uppercase tracking-wider">
+                            <span className="material-symbols-rounded text-[1.2em]">calculate</span>
+                            Sub-Total
+                        </label>
+                        <div className="px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-500 font-bold text-sm h-[46px] flex items-center cursor-not-allowed">
+                            ${subTotalVisual.toFixed(2)}
+                        </div>
+                    </div>
+
+                    {/* Visual Monto Total */}
+                    <div className="space-y-1.5 group">
+                        <label className="text-[11px] font-bold text-slate-400 flex items-center gap-1.5 uppercase tracking-wider">
+                            <span className="material-symbols-rounded text-[1.2em]">functions</span>
+                            Monto Total
+                        </label>
+                        <div className="px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-500 font-bold text-sm h-[46px] flex items-center cursor-not-allowed">
+                            ${montoTotalVisual.toFixed(2)}
+                        </div>
+                    </div>
+
                     <SmartInput
                         label="Monto Pagado"
                         type="number"
@@ -116,15 +144,33 @@ export const PaymentForm = ({
                         icon="receipt_long"
                     />
 
-                    {/* Fecha - Bloqueada si hay deudas seleccionadas */}
-                    <SmartInput
-                        label="Fecha de Pago"
-                        type="month" // YYYY-MM
-                        error={errors.fecha_pago?.message}
-                        disabled={hasSelection}
-                        {...register('fecha_pago')}
-                        icon="calendar_month"
-                    />
+                    {/* Fecha - Bloqueada si hay deudas seleccionadas con logica especial */}
+                    {isMultiSelection ? (
+                        <div className="space-y-1.5 group">
+                            <label className="text-[11px] font-bold text-slate-400 flex items-center gap-1.5 uppercase tracking-wider">
+                                <span className="material-symbols-rounded text-[1.2em]">calendar_month</span>
+                                Fechas Seleccionadas
+                            </label>
+                            <select 
+                                disabled
+                                className="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-sm font-bold text-slate-600 focus:outline-none focus:ring-4 cursor-not-allowed"
+                            >
+                                <option>Varios Meses Seleccionados</option>
+                                {selectedDebts.map(d => (
+                                    <option key={d.mes} value={d.mes}>{d.mes}</option>
+                                ))}
+                            </select>
+                        </div>
+                    ) : (
+                        <SmartInput
+                            label="Fecha de Pago"
+                            type="month" // YYYY-MM
+                            error={errors.fecha_pago?.message}
+                            disabled={hasSelection}
+                            {...register('fecha_pago')}
+                            icon="calendar_month"
+                        />
+                    )}
                 </div>
 
                 <hr className="border-slate-100" />

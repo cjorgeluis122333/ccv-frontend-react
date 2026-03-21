@@ -143,7 +143,7 @@ export const PaymentScreen = () => {
             </div>
 
             {/* Búsqueda */}
-            <div className="relative z-30">
+            <div className="relative z-10 w-full">
                 <InputSearch<Partner>
                     label="Buscar Socio para Pago"
                     placeholder="Buscar por nombre, cédula o número de acción..."
@@ -248,9 +248,8 @@ export const PaymentScreen = () => {
                             calculateDistribution={calculateDistribution}
                             totalSelectedAmount={totalSelectedAmount}
                             descriptionFromSelection={generateDescription()}
-                            isSingleSelection={isSingleSelection}
-                            isMultiSelection={isMultiSelection}
                             hasSelection={hasSelection}
+                            selectedDebts={selectedDebts}
                             onSubmit={handlePaymentSubmit}
                             isSubmitting={isSubmitting}
                             serverErrors={serverErrors}

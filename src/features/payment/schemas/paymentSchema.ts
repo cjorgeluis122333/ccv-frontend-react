@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 export const paymentSchema = z.object({
-    monto_total: z.number().min(0.01, "El monto total debe ser mayor a 0"),
     monto_pagado: z.number().min(0.01, "El monto pagado debe ser mayor a 0"),
     abono: z.number().optional(), // Solo visual, no se envía, pero puede estar en el form
     recibo: z.string().min(1, "El recibo es obligatorio"),
