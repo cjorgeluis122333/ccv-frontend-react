@@ -32,8 +32,6 @@ export const PaymentScreen = () => {
         selectedDebts,
         toggleDebtSelection,
         clearSelection,
-        isSingleSelection,
-        isMultiSelection,
         hasSelection,
         totalSelectedAmount,
         generateDescription,
