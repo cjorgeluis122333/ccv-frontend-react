@@ -45,7 +45,7 @@ export interface FamilyResponse {
 export interface HistoryItem {
     ind: number;
     acc: number;
-    time: string;
+    resibo: string | null;
     fecha: string;
     mes: string;
     oper: string;

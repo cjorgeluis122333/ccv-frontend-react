@@ -71,6 +71,7 @@ export const PartnerHistoryList = ({ historyData, isLoading, error, onPageChange
                         <tr className="bg-slate-50/80 border-b border-slate-100 text-xs font-bold text-slate-500 uppercase tracking-wider">
                             <th className="px-6 py-4">Fecha</th>
                             <th className="px-6 py-4">Descripción / Mes</th>
+                            <th className="px-6 py-4">Recibo</th>
                             <th className="px-6 py-4">Operador</th>
                             <th className="px-6 py-4 text-right">Monto</th>
                         </tr>
@@ -96,6 +97,12 @@ export const PartnerHistoryList = ({ historyData, isLoading, error, onPageChange
                                             </span>
                                             <span className="text-xs text-slate-500">Ref: {item.mes}</span>
                                         </div>
+                                    </div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="flex items-center gap-2">
+                                        <span className="material-symbols-rounded text-slate-300 text-[18px]">receipt</span>
+                                        <span className="text-sm font-semibold text-slate-700">{item.resibo || '-'}</span>
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
@@ -136,6 +143,11 @@ export const PartnerHistoryList = ({ historyData, isLoading, error, onPageChange
                                             {item.oper.split('|')[0] || 'Ope'}
                                         </span>
                                         <span className="text-xs font-semibold text-slate-500">Ref: {item.mes}</span>
+                                        {item.resibo && (
+                                            <span className="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
+                                                Recibo: {item.resibo}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                                 <span className="text-sm font-black text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100 shadow-sm whitespace-nowrap shrink-0">
