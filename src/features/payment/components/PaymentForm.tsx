@@ -159,14 +159,20 @@ export const PaymentForm = ({
                                 Fechas Seleccionadas
                             </label>
                             <select 
-                                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer"
-                                defaultValue="summary"
+                                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer appearance-none"
+                                value="summary"
+                                readOnly
                             >
                                 <option value="summary">{displayDates}</option>
                                 {sortedSelectedDebts.map(d => (
-                                    <option key={d.mes} value={d.mes}>{d.mes}</option>
+                                    <option key={d.mes} value={d.mes} disabled className="text-slate-400">
+                                        • {d.mes}
+                                    </option>
                                 ))}
                             </select>
+                            <span className="absolute right-4 top-[3.2rem] material-symbols-rounded text-slate-400 pointer-events-none">
+                                arrow_drop_down
+                            </span>
                         </div>
                     ) : (
                         <SmartInput
