@@ -26,7 +26,8 @@ export const usePaymentFeature = (userInfo: any) => {
     const hasSelection = selectedDebts.length > 0;
 
     const totalSelectedAmount = useMemo(() => {
-        return selectedDebts.reduce((acc, curr) => acc + curr.deuda_pendiente, 0);
+        const total = selectedDebts.reduce((acc, curr) => acc + curr.deuda_pendiente, 0);
+        return Number(total.toFixed(2));
     }, [selectedDebts]);
 
     // Generate automatic description based on selection

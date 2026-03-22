@@ -141,7 +141,7 @@ export const PaymentScreen = () => {
             </div>
 
             {/* Búsqueda */}
-            <div className="relative z-10 w-full">
+            <div className="relative z-20 w-full">
                 <InputSearch<Partner>
                     label="Buscar Socio para Pago"
                     placeholder="Buscar por nombre, cédula o número de acción..."

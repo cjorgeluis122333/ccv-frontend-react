@@ -64,6 +64,7 @@ export const PaymentForm = ({
     const isSingleSelection = selectedDebts.length === 1;
 
     // Formateo de fechas para el select (coma y puntos suspensivos)
+    const roundedTotal = Number(totalSelectedAmount.toFixed(2));
     const sortedSelectedDebts = [...selectedDebts].sort((a, b) => b.mes.localeCompare(a.mes));
     const formattedDates = selectedDebts.map(d => d.mes).join(', ');
     const displayDates = formattedDates.length > 35 
@@ -73,7 +74,7 @@ export const PaymentForm = ({
     // Sync form values when debt selection changes
     useEffect(() => {
         if (hasSelection) {
-            setValue("monto_pagado", totalSelectedAmount);
+            setValue("monto_pagado", roundedTotal);
             setValue("descripcion", descriptionFromSelection);
             
             // Set first date to avoid validation errors, but we will block the original input
@@ -161,7 +162,7 @@ export const PaymentForm = ({
                             <select 
                                 className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer appearance-none"
                                 value="summary"
-                                readOnly
+                                onChange={() => {}} // Read-only controlled component
                             >
                                 <option value="summary">{displayDates}</option>
                                 {sortedSelectedDebts.map(d => (
