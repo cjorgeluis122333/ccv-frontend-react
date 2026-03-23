@@ -12,6 +12,7 @@ import { usePartnerDebts } from '../hooks/usePartnerDebts';
 import { usePaymentFeature } from '../hooks/usePaymentFeature';
 import type { PaymentFormValues } from '../schemas/paymentSchema';
 import { paymentService } from '../services/paymentService';
+import type { Debt } from '../types/paymentTypes';
 
 const mockUserInfo = { name: "Jorge" };
 
@@ -36,6 +37,7 @@ export const PaymentScreen = () => {
 
     const {
         selectedDebts,
+        selectSingleDebt,
         toggleDebtSelection,
         clearSelection,
         hasSelection,
@@ -82,6 +84,13 @@ export const PaymentScreen = () => {
         setIsDropdownOpen(false);
         clearSelection();
         loadDebts(partner.acc);
+    };
+
+    const handleAutoSelectDebtByMonth = (month: string) => {
+        const matchingDebt = debts.find((debt: Debt) => debt.mes === month);
+        if (matchingDebt) {
+            selectSingleDebt(matchingDebt);
+        }
     };
 
     const handlePaymentSubmit = async (data: PaymentFormValues) => {
@@ -239,11 +248,13 @@ export const PaymentScreen = () => {
 
                     <div className="xl:col-span-7">
                         <PaymentForm
+                            debts={debts}
                             calculateDistribution={calculateDistribution}
                             totalSelectedAmount={totalSelectedAmount}
                             descriptionFromSelection={generateDescription()}
                             hasSelection={hasSelection}
                             selectedDebts={selectedDebts}
+                            onAutoSelectDebtByMonth={handleAutoSelectDebtByMonth}
                             onSubmit={handlePaymentSubmit}
                             isSubmitting={isSubmitting}
                             serverErrors={serverErrors}

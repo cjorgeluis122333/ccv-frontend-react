@@ -10,6 +10,10 @@ type PaymentOperatorInfo = {
 export const usePaymentFeature = (userInfo: PaymentOperatorInfo) => {
     const [selectedDebts, setSelectedDebts] = useState<Debt[]>([]);
 
+    const selectSingleDebt = (debt: Debt) => {
+        setSelectedDebts([debt]);
+    };
+
     const toggleDebtSelection = (debt: Debt) => {
         setSelectedDebts(prev => {
             const exists = prev.find(d => d.mes === debt.mes);
@@ -118,6 +122,7 @@ export const usePaymentFeature = (userInfo: PaymentOperatorInfo) => {
 
     return {
         selectedDebts,
+        selectSingleDebt,
         toggleDebtSelection,
         clearSelection,
         isSingleSelection,
