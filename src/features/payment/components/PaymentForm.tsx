@@ -1,8 +1,8 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
-import { paymentSchema, type PaymentFormValues } from "../schemas/paymentSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, useWatch } from "react-hook-form";
 import { SmartInput } from "@/components/input/SmartInput";
+import { paymentSchema, type PaymentFormValues } from "../schemas/paymentSchema";
 
 interface PaymentFormProps {
     totalSelectedAmount: number;
@@ -12,7 +12,7 @@ interface PaymentFormProps {
     calculateDistribution: (monto: number) => { abono: number };
     onSubmit: (data: PaymentFormValues) => void;
     isSubmitting: boolean;
-    serverErrors?: Record<string, string[]>; // formato "pagos.0.monto": ["..."]
+    serverErrors?: Record<string, string[]>;
 }
 
 export const PaymentForm = ({
@@ -25,12 +25,11 @@ export const PaymentForm = ({
     isSubmitting,
     serverErrors
 }: PaymentFormProps) => {
-
     const {
         register,
         handleSubmit,
-        watch,
         setValue,
+        control,
         formState: { errors }
     } = useForm<PaymentFormValues>({
         resolver: zodResolver(paymentSchema),
@@ -44,51 +43,32 @@ export const PaymentForm = ({
         }
     });
 
-    const operacionValue = watch("operacion");
-    const montoPagadoValue = watch("monto_pagado") || 0;
+    const operacionValue = useWatch({ control, name: "operacion" });
+    const montoPagadoValue = useWatch({ control, name: "monto_pagado" }) || 0;
     const { abono: calculatedAbono } = calculateDistribution(montoPagadoValue);
 
-    // Calculo de Sub-Total e Impuesto (tomamos el del primer mes)
     const impuesto = selectedDebts.length > 0 ? (selectedDebts[0].impuesto || 16) : 16;
     const subTotalVisual = montoPagadoValue / (1 + (impuesto / 100));
-    
-    // Calculo de Monto Total según operación
-    // Si la operación es pago, Monto Total = Monto Pagado * 1. Si es descuento, pendiente pero lo dejamos igual por ahora.
-    let montoTotalVisual = montoPagadoValue;
-    if (operacionValue === 'descuento') {
-        montoTotalVisual = montoPagadoValue; // Implementar suma de PENDIENTE en un futuro
-    }
 
-    // Calculo dinámico de Fechas Seleccionadas
     const isMultiSelection = selectedDebts.length > 1;
-    const isSingleSelection = selectedDebts.length === 1;
-
-    // Formateo de fechas para el select (coma y puntos suspensivos)
     const roundedTotal = Number(totalSelectedAmount.toFixed(2));
+    const montoTotalVisual = hasSelection ? roundedTotal : montoPagadoValue;
     const sortedSelectedDebts = [...selectedDebts].sort((a, b) => b.mes.localeCompare(a.mes));
     const formattedDates = selectedDebts.map(d => d.mes).join(', ');
-    const displayDates = formattedDates.length > 35 
-        ? formattedDates.substring(0, 32) + '...' 
+    const displayDates = formattedDates.length > 35
+        ? formattedDates.substring(0, 32) + '...'
         : formattedDates;
 
-    // Sync form values when debt selection changes
     useEffect(() => {
         if (hasSelection) {
             setValue("monto_pagado", roundedTotal);
             setValue("descripcion", descriptionFromSelection);
-            
-            // Set first date to avoid validation errors, but we will block the original input
-            if (isSingleSelection) {
-                setValue("fecha_pago", selectedDebts[0].mes);
-            } else {
-                setValue("fecha_pago", selectedDebts[0].mes); // fallback para Zod, la UI mostrará otra cosa
-            }
-            
+            setValue("fecha_pago", selectedDebts[0].mes);
         } else {
             setValue("monto_pagado", 0);
             setValue("descripcion", "");
         }
-    }, [hasSelection, totalSelectedAmount, descriptionFromSelection, isSingleSelection, selectedDebts, setValue]);
+    }, [descriptionFromSelection, hasSelection, roundedTotal, selectedDebts, setValue]);
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col h-full">
@@ -100,11 +80,7 @@ export const PaymentForm = ({
             </div>
 
             <div className="p-5 sm:p-6 flex-1 space-y-6">
-                
-                {/* Módulo de Montos */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                    
-                    {/* Visual Sub-Total */}
                     <div className="space-y-1.5 group">
                         <label className="text-[11px] font-bold text-slate-400 flex items-center gap-1.5 uppercase tracking-wider">
                             <span className="material-symbols-rounded text-[1.2em]">calculate</span>
@@ -115,7 +91,6 @@ export const PaymentForm = ({
                         </div>
                     </div>
 
-                    {/* Visual Monto Total */}
                     <div className="space-y-1.5 group">
                         <label className="text-[11px] font-bold text-slate-400 flex items-center gap-1.5 uppercase tracking-wider">
                             <span className="material-symbols-rounded text-[1.2em]">functions</span>
@@ -134,11 +109,11 @@ export const PaymentForm = ({
                         {...register('monto_pagado', { valueAsNumber: true })}
                         icon="paid"
                     />
-                    
+
                     <div className="space-y-1.5 group">
                         <label className="text-[11px] font-bold text-slate-400 flex items-center gap-1.5 uppercase tracking-wider">
                             <span className="material-symbols-rounded text-[1.2em]">savings</span>
-                            Abono (Visual)
+                            Abono
                         </label>
                         <div className="px-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-emerald-600 font-bold text-sm h-[46px] flex items-center shadow-inner cursor-not-allowed">
                             ${calculatedAbono.toFixed(2)}
@@ -152,22 +127,21 @@ export const PaymentForm = ({
                         icon="receipt_long"
                     />
 
-                    {/* Fecha - Bloqueada si hay deudas seleccionadas con logica especial */}
                     {isMultiSelection ? (
                         <div className="space-y-1.5 group">
                             <label className="text-[11px] font-bold text-slate-400 flex items-center gap-1.5 uppercase tracking-wider">
                                 <span className="material-symbols-rounded text-[1.2em]">calendar_month</span>
                                 Fechas Seleccionadas
                             </label>
-                            <select 
+                            <select
                                 className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer appearance-none"
                                 value="summary"
-                                onChange={() => {}} // Read-only controlled component
+                                onChange={() => {}}
                             >
                                 <option value="summary">{displayDates}</option>
                                 {sortedSelectedDebts.map(d => (
                                     <option key={d.mes} value={d.mes} disabled className="text-slate-400">
-                                        • {d.mes}
+                                        - {d.mes}
                                     </option>
                                 ))}
                             </select>
@@ -178,7 +152,7 @@ export const PaymentForm = ({
                     ) : (
                         <SmartInput
                             label="Fecha de Pago"
-                            type="month" // YYYY-MM
+                            type="month"
                             error={errors.fecha_pago?.message}
                             disabled={hasSelection}
                             {...register('fecha_pago')}
@@ -189,14 +163,13 @@ export const PaymentForm = ({
 
                 <hr className="border-slate-100" />
 
-                {/* Módulo Operación */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div className="space-y-1.5">
                         <label className="text-[11px] font-bold text-slate-400 flex items-center gap-1.5 uppercase tracking-wider">
                             <span className="material-symbols-rounded text-[1.2em]">tune</span>
                             Operación
                         </label>
-                        <select 
+                        <select
                             className={`w-full px-4 py-3 bg-slate-50 border rounded-xl text-sm font-medium focus:outline-none focus:ring-4 transition-all
                                 ${errors.operacion ? 'border-rose-300 focus:ring-rose-500/10 focus:border-rose-500 text-rose-600' : 'border-slate-200 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700'}`}
                             {...register('operacion')}
@@ -205,16 +178,6 @@ export const PaymentForm = ({
                             <option value="descuento">Descuento</option>
                         </select>
                         {errors.operacion && <p className="text-xs font-bold text-rose-500 mt-1">{errors.operacion.message}</p>}
-                    </div>
-
-                    <div className="md:col-span-2">
-                        <SmartInput
-                            label="Descripción"
-                            error={errors.descripcion?.message}
-                            placeholder={hasSelection ? descriptionFromSelection : "Descripción generada o manual..."}
-                            {...register('descripcion')}
-                            icon="description"
-                        />
                     </div>
 
                     {operacionValue === 'descuento' && (
@@ -229,19 +192,18 @@ export const PaymentForm = ({
                     )}
                 </div>
 
-                {/* Mostrar Errores del Servidor de Listas (ej: pagos.0.monto) */}
                 {serverErrors && Object.keys(serverErrors).length > 0 && (
-                     <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl space-y-2">
-                         <div className="flex items-center gap-2 text-rose-700 font-bold mb-2">
-                             <span className="material-symbols-rounded text-xl">error</span>
-                             Errores de validación del servidor:
-                         </div>
-                         <ul className="list-disc pl-5 text-sm text-rose-600 space-y-1 font-medium">
+                    <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl space-y-2">
+                        <div className="flex items-center gap-2 text-rose-700 font-bold mb-2">
+                            <span className="material-symbols-rounded text-xl">error</span>
+                            Errores de validación del servidor:
+                        </div>
+                        <ul className="list-disc pl-5 text-sm text-rose-600 space-y-1 font-medium">
                             {Object.entries(serverErrors).map(([key, messages]) => (
                                 <li key={key}>{messages.join(' ')}</li>
                             ))}
-                         </ul>
-                     </div>
+                        </ul>
+                    </div>
                 )}
             </div>
 
