@@ -65,8 +65,6 @@ export const PaymentForm = ({
     const fechaPagoValue = useWatch({ control, name: "fecha_pago" }) || "";
     const { abono: calculatedAbono } = calculateDistribution(montoPagadoValue);
 
-    const impuesto = selectedDebts.length > 0 ? (selectedDebts[0].impuesto || 16) : 16;
-    const subTotalVisual = montoPagadoValue / (1 + (impuesto / 100));
 
     const isMultiSelection = selectedDebts.length > 1;
     const roundedTotal = Number(totalSelectedAmount.toFixed(2));
@@ -76,6 +74,9 @@ export const PaymentForm = ({
     const displayDates = formattedDates.length > 35
         ? formattedDates.substring(0, 32) + "..."
         : formattedDates;
+
+    const impuesto = selectedDebts.length > 0 ? (selectedDebts[0].impuesto || 16) : 16;
+    const subTotalVisual = montoTotalVisual / (1 + (impuesto / 100));
 
     const matchingDebtByMonth = useMemo(
         () => debts.find(debt => debt.mes === fechaPagoValue),
