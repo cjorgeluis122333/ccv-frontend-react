@@ -16,13 +16,26 @@ export interface Debt {
     estado: string;
 }
 
+export interface PartnerDebtsBaseData {
+    socio: PartnerInfo;
+    resumen_deudas: Debt[];
+    total_a_pagar: number;
+}
+
+export interface PartnerDebtsData extends PartnerDebtsBaseData {
+    hijos_mayores_30: string[];
+}
+
+export type PartnerAdvanceDebtsData = PartnerDebtsBaseData
+
 export interface PartnerDebtsResponse {
     message: string;
-    data: {
-        socio: PartnerInfo;
-        resumen_deudas: Debt[];
-        total_a_pagar: number;
-    }
+    data: PartnerDebtsData;
+}
+
+export interface PartnerAdvanceDebtsResponse {
+    message: string;
+    data: PartnerAdvanceDebtsData;
 }
 
 export interface PaymentItemPayload {
@@ -32,12 +45,12 @@ export interface PaymentItemPayload {
 
 export interface PaymentPayload {
     acc: number;
-    time: string; // "1738595432" timestamp
+    time: string;
     oper: "pago" | "descuento";
-    resibo: string; // "REC-88442" (en el payload original dice resibo)
+    resibo: string;
     control: string | null;
     factura: string | null;
-    descript: string; // "Pago mensualidad Marzo + Abril adelantado"
+    descript: string;
     observaciones: string | null;
     seniat: "si" | "no";
     operador: string;

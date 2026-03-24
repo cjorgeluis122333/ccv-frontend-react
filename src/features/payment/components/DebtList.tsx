@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import type { Debt } from '../types/paymentTypes';
 
 interface DebtListProps {
@@ -5,10 +6,20 @@ interface DebtListProps {
     selectedDebts: Debt[];
     onToggleDebt: (debt: Debt) => void;
     isLoading: boolean;
+    error?: string | null;
+    emptyTitle?: string;
+    emptyMessage?: string;
 }
 
-export const DebtList = ({ debts, selectedDebts, onToggleDebt, isLoading }: DebtListProps) => {
-
+const DebtListComponent = ({
+    debts,
+    selectedDebts,
+    onToggleDebt,
+    isLoading,
+    error,
+    emptyTitle = 'Al dia',
+    emptyMessage = 'El socio no presenta deudas pendientes.'
+}: DebtListProps) => {
     if (isLoading) {
         return (
             <div className="flex flex-col items-center justify-center p-8 text-slate-400">
@@ -18,12 +29,22 @@ export const DebtList = ({ debts, selectedDebts, onToggleDebt, isLoading }: Debt
         );
     }
 
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center p-8 text-center bg-rose-50 border border-rose-200 rounded-xl">
+                <span className="material-symbols-rounded text-4xl text-rose-500 mb-2">error</span>
+                <p className="font-bold text-rose-700">No se pudieron cargar las deudas</p>
+                <p className="text-xs text-rose-600 max-w-sm">{error}</p>
+            </div>
+        );
+    }
+
     if (!debts || debts.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center p-8 text-center bg-slate-50 border border-slate-200 border-dashed rounded-xl">
                 <span className="material-symbols-rounded text-4xl text-emerald-400 mb-2">check_circle</span>
-                <p className="font-bold text-slate-600">Al día</p>
-                <p className="text-xs text-slate-500">El socio no presenta deudas pendientes.</p>
+                <p className="font-bold text-slate-600">{emptyTitle}</p>
+                <p className="text-xs text-slate-500">{emptyMessage}</p>
             </div>
         );
     }
@@ -43,7 +64,6 @@ export const DebtList = ({ debts, selectedDebts, onToggleDebt, isLoading }: Debt
                         }
                         `}
                     >
-                        {/* Indicador visual de selección en la esquina */}
                         {isSelected && (
                             <div className="absolute top-0 right-0 w-8 h-8 flex items-start justify-end p-1.5 bg-indigo-500 rounded-bl-xl z-10">
                                 <span className="material-symbols-rounded text-white text-[14px]">check</span>
@@ -51,7 +71,7 @@ export const DebtList = ({ debts, selectedDebts, onToggleDebt, isLoading }: Debt
                         )}
 
                         <div className="flex items-center gap-3 relative z-20">
-                            <div className={`p-2 rounded-lg 
+                            <div className={`p-2 rounded-lg
                                 ${isSelected ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-500 group-hover:bg-indigo-50 group-hover:text-indigo-500'} transition-colors`}
                             >
                                 <span className="material-symbols-rounded text-[20px]">calendar_month</span>
@@ -74,3 +94,5 @@ export const DebtList = ({ debts, selectedDebts, onToggleDebt, isLoading }: Debt
         </div>
     );
 };
+
+export const DebtList = memo(DebtListComponent);

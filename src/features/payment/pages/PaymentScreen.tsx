@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import axios from 'axios';
 import { InputSearch } from "@/components/input/InputSearch.tsx";
 import { usePartners } from '@/features/partner/hooks/usePartners';
@@ -15,6 +15,7 @@ import { paymentService } from '../services/paymentService';
 import type { Debt } from '../types/paymentTypes';
 
 const mockUserInfo = { name: "Jorge" };
+const DEFAULT_ADVANCE_MONTHS = '10';
 
 type PaymentModalConfig = {
     isOpen: boolean;
@@ -23,15 +24,37 @@ type PaymentModalConfig = {
     title?: string;
 };
 
+type DebtSection = 'current' | 'future';
+
+const normalizeAdvanceMonths = (value: string) => {
+    const parsedValue = Number.parseInt(value, 10);
+
+    if (Number.isNaN(parsedValue) || parsedValue < 0) {
+        return 0;
+    }
+
+    return parsedValue;
+};
+
 export const PaymentScreen = () => {
     const { partners: allPartners, searchTerm, setSearchTerm, isLoading: isPartnersLoading } = usePartners();
     const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
+    const [activeSection, setActiveSection] = useState<DebtSection>('current');
+    const [advanceMonthsInput, setAdvanceMonthsInput] = useState(DEFAULT_ADVANCE_MONTHS);
+    const [debouncedAdvanceMonths, setDebouncedAdvanceMonths] = useState(0);
 
     const {
-        debts,
+        currentDebts,
+        futureDebts,
         partnerInfo,
-        isLoading: isDebtsLoading,
-        loadDebts,
+        childrenOver30,
+        isCurrentLoading,
+        isFutureLoading,
+        currentError,
+        futureError,
+        loadCurrentDebts,
+        loadFutureDebts,
+        invalidatePartnerCache,
         clearDebts
     } = usePartnerDebts();
 
@@ -56,42 +79,110 @@ export const PaymentScreen = () => {
     });
     const [serverErrors, setServerErrors] = useState<Record<string, string[]> | undefined>();
 
+    const normalizedAdvanceMonths = useMemo(
+        () => normalizeAdvanceMonths(advanceMonthsInput),
+        [advanceMonthsInput]
+    );
+
+    const handleSearchReset = useCallback(() => {
+        setSelectedPartner(null);
+        setActiveSection('current');
+        setAdvanceMonthsInput(DEFAULT_ADVANCE_MONTHS);
+        clearDebts();
+        clearSelection();
+    }, [clearDebts, clearSelection]);
+
     const {
         isDropdownOpen,
         setIsDropdownOpen,
         dropdownRef,
         handleSearchChange
-    } = useSearchGeneric(setSearchTerm, () => {
-        setSelectedPartner(null);
-        clearDebts();
-        clearSelection();
-    });
+    } = useSearchGeneric(setSearchTerm, handleSearchReset);
 
     const { filteredItems, isFiltering } = useGenericFilter<Partner>({
         items: allPartners,
         searchTerm,
-        filterFn: (p, term) => {
-            const nombre = p.nombre?.toLowerCase() || "";
-            const acc = String(p.acc || "");
-            const cedula = String(p.cedula || "");
+        filterFn: (partner, term) => {
+            const nombre = partner.nombre?.toLowerCase() || "";
+            const acc = String(partner.acc || "");
+            const cedula = String(partner.cedula || "");
             return nombre.includes(term) || acc.includes(term) || cedula.includes(term);
         }
     });
 
-    const handleSelectPartner = (partner: Partner) => {
+    useEffect(() => {
+        const timeoutId = window.setTimeout(() => {
+            setDebouncedAdvanceMonths(normalizedAdvanceMonths);
+        }, 350);
+
+        return () => window.clearTimeout(timeoutId);
+    }, [normalizedAdvanceMonths]);
+
+    useEffect(() => {
+        if (!selectedPartner || activeSection !== 'future') {
+            return;
+        }
+
+        clearSelection();
+        void loadFutureDebts(selectedPartner.acc, debouncedAdvanceMonths);
+    }, [
+        activeSection,
+        clearSelection,
+        debouncedAdvanceMonths,
+        loadFutureDebts,
+        selectedPartner
+    ]);
+
+    const displayedDebts = useMemo(
+        () => activeSection === 'current' ? currentDebts : futureDebts,
+        [activeSection, currentDebts, futureDebts]
+    );
+
+    const isDebtsLoading = activeSection === 'current' ? isCurrentLoading : isFutureLoading;
+    const debtsError = activeSection === 'current' ? currentError : futureError;
+    const emptyDebtState = activeSection === 'current'
+        ? {
+            title: 'Al dia',
+            message: 'El socio no presenta deudas pendientes.'
+        }
+        : {
+            title: 'Sin deudas futuras',
+            message: 'No hay deudas futuras para el adelanto indicado.'
+        };
+
+    const handleSelectPartner = useCallback((partner: Partner) => {
         setSelectedPartner(partner);
         setSearchTerm(partner.nombre);
         setIsDropdownOpen(false);
+        setActiveSection('current');
+        setAdvanceMonthsInput(DEFAULT_ADVANCE_MONTHS);
         clearSelection();
-        loadDebts(partner.acc);
-    };
+        void loadCurrentDebts(partner.acc);
+    }, [clearSelection, loadCurrentDebts, setIsDropdownOpen, setSearchTerm]);
 
-    const handleAutoSelectDebtByMonth = (month: string) => {
-        const matchingDebt = debts.find((debt: Debt) => debt.mes === month);
+    const handleAutoSelectDebtByMonth = useCallback((month: string) => {
+        const matchingDebt = displayedDebts.find((debt: Debt) => debt.mes === month);
         if (matchingDebt) {
             selectSingleDebt(matchingDebt);
         }
-    };
+    }, [displayedDebts, selectSingleDebt]);
+
+    const handleSectionChange = useCallback((section: DebtSection) => {
+        setActiveSection(section);
+        clearSelection();
+
+        if (section === 'current' && selectedPartner) {
+            void loadCurrentDebts(selectedPartner.acc);
+        }
+    }, [clearSelection, loadCurrentDebts, selectedPartner]);
+
+    const handleAdvanceMonthsChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+        const nextValue = event.target.value;
+
+        if (nextValue === '' || /^\d+$/.test(nextValue)) {
+            setAdvanceMonthsInput(nextValue);
+        }
+    }, []);
 
     const handlePaymentSubmit = async (data: PaymentFormValues) => {
         if (!selectedPartner) return;
@@ -126,7 +217,14 @@ export const PaymentScreen = () => {
             });
 
             clearSelection();
-            loadDebts(selectedPartner.acc);
+            invalidatePartnerCache(selectedPartner.acc);
+
+            await Promise.all([
+                loadCurrentDebts(selectedPartner.acc, { force: true }),
+                activeSection === 'future'
+                    ? loadFutureDebts(selectedPartner.acc, debouncedAdvanceMonths, { force: true })
+                    : Promise.resolve(null)
+            ]);
         } catch (error: unknown) {
             console.error("Payment error:", error);
             const status = axios.isAxiosError(error) ? error.response?.status : undefined;
@@ -139,14 +237,14 @@ export const PaymentScreen = () => {
                     isOpen: true,
                     variant: 'error',
                     title: 'Error en el Pago',
-                    message: responseMessage || "Los datos proporcionados no son válidos."
+                    message: responseMessage || "Los datos proporcionados no son validos."
                 });
             } else {
                 setModalConfig({
                     isOpen: true,
                     variant: 'error',
                     title: 'Error en el Pago',
-                    message: "Ocurrió un error inesperado al procesar el pago."
+                    message: "Ocurrio un error inesperado al procesar el pago."
                 });
             }
         } finally {
@@ -163,9 +261,9 @@ export const PaymentScreen = () => {
                     </div>
                     <div className="space-y-0.5">
                         <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                            Gestión de Pagos
+                            Gestion de Pagos
                         </h1>
-                        <p className="text-slate-500 text-sm font-medium">Búsqueda de socios, visualización de deudas y procesamiento de pagos.</p>
+                        <p className="text-slate-500 text-sm font-medium">Busqueda de socios, visualizacion de deudas y procesamiento de pagos.</p>
                     </div>
                 </div>
             </div>
@@ -173,7 +271,7 @@ export const PaymentScreen = () => {
             <div className="relative z-20 w-full">
                 <InputSearch<Partner>
                     label="Buscar Socio para Pago"
-                    placeholder="Buscar por nombre, cédula o número de acción..."
+                    placeholder="Buscar por nombre, cedula o numero de accion..."
                     searchTerm={searchTerm}
                     onSearchChange={handleSearchChange}
                     onFocus={() => setIsDropdownOpen(true)}
@@ -183,7 +281,7 @@ export const PaymentScreen = () => {
                     items={filteredItems}
                     onSelectItem={handleSelectPartner}
                     dropdownRef={dropdownRef}
-                    keyExtractor={(p) => p.acc}
+                    keyExtractor={(partner) => partner.acc}
                     renderItem={(partner) => (
                         <>
                             <div className="font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">
@@ -224,31 +322,123 @@ export const PaymentScreen = () => {
                         </div>
 
                         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col">
-                            <div className="p-5 border-b border-slate-100 bg-slate-50/80 flex justify-between items-center">
-                                <h2 className="text-sm font-black text-slate-800 flex items-center gap-2">
-                                    <span className="material-symbols-rounded text-rose-500">receipt_long</span>
-                                    Deudas Pendientes
-                                </h2>
-                                {!isDebtsLoading && (
-                                    <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
-                                        Total: ${totalSelectedAmount.toFixed(2)}
-                                    </span>
-                                )}
+                            <div className="p-5 border-b border-slate-100 bg-slate-50/80 space-y-4">
+                                <div className="flex justify-between items-center gap-4">
+                                    <h2 className="text-sm font-black text-slate-800 flex items-center gap-2">
+                                        <span className="material-symbols-rounded text-rose-500">receipt_long</span>
+                                        Historial de Deudas
+                                    </h2>
+                                    {!isDebtsLoading && (
+                                        <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+                                            Seleccionado: ${totalSelectedAmount.toFixed(2)}
+                                        </span>
+                                    )}
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => handleSectionChange('current')}
+                                        className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all border ${
+                                            activeSection === 'current'
+                                                ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                                                : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300 hover:text-indigo-600'
+                                        }`}
+                                    >
+                                        Hasta el mes actual
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleSectionChange('future')}
+                                        className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all border ${
+                                            activeSection === 'future'
+                                                ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
+                                                : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300 hover:text-indigo-600'
+                                        }`}
+                                    >
+                                        Deudas futuras
+                                    </button>
+                                </div>
                             </div>
-                            <div className="p-5 bg-slate-50/40">
+
+                            <div className="p-5 bg-slate-50/40 space-y-4">
                                 <DebtList
-                                    debts={debts}
+                                    debts={displayedDebts}
                                     selectedDebts={selectedDebts}
                                     onToggleDebt={toggleDebtSelection}
                                     isLoading={isDebtsLoading}
+                                    error={debtsError}
+                                    emptyTitle={emptyDebtState.title}
+                                    emptyMessage={emptyDebtState.message}
                                 />
+
+                                {activeSection === 'future' && (
+                                    <div className="rounded-xl border border-slate-200 bg-white p-4 space-y-3">
+                                        <div className="space-y-1">
+                                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                                <span className="material-symbols-rounded text-[1.2em]">schedule</span>
+                                                Meses por adelanto
+                                            </label>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                step="1"
+                                                inputMode="numeric"
+                                                value={advanceMonthsInput}
+                                                onChange={handleAdvanceMonthsChange}
+                                                placeholder="0"
+                                                className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-all shadow-sm hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                                            />
+                                        </div>
+                                        <p className="text-xs text-slate-500 font-medium">
+                                            Este valor se envia como parametro <code>adelanto</code> al listar las deudas futuras.
+                                        </p>
+                                    </div>
+                                )}
                             </div>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                            <div className="flex items-center justify-between gap-4 mb-4">
+                                <h3 className="text-[11px] font-bold text-slate-400 flex items-center gap-1.5 uppercase tracking-wider">
+                                    <span className="material-symbols-rounded text-[1.2em]">groups</span>
+                                    Hijos Mayores de 30
+                                </h3>
+                                <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+                                    {childrenOver30.length}
+                                </span>
+                            </div>
+
+                            {isCurrentLoading && !partnerInfo ? (
+                                <div className="flex items-center gap-3 rounded-xl border border-slate-200 border-dashed bg-slate-50 p-4 text-slate-500">
+                                    <span className="material-symbols-rounded text-indigo-400 animate-spin">progress_activity</span>
+                                    <p className="text-sm font-medium">Cargando informacion complementaria...</p>
+                                </div>
+                            ) : childrenOver30.length === 0 ? (
+                                <div className="rounded-xl border border-slate-200 border-dashed bg-slate-50 p-4 text-sm font-medium text-slate-500">
+                                    No tiene socio numero.
+                                </div>
+                            ) : (
+                                <ul className="space-y-3">
+                                    {childrenOver30.map((childName) => (
+                                        <li
+                                            key={childName}
+                                            className="flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50/70 px-4 py-3"
+                                        >
+                                            <span className="material-symbols-rounded text-indigo-500">person</span>
+                                            <span className="text-sm font-semibold text-slate-700 capitalize">
+                                                {childName}
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
                         </div>
                     </div>
 
                     <div className="xl:col-span-7">
                         <PaymentForm
-                            debts={debts}
+                            debts={displayedDebts}
                             calculateDistribution={calculateDistribution}
                             totalSelectedAmount={totalSelectedAmount}
                             descriptionFromSelection={generateDescription()}

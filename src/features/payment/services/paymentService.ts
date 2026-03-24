@@ -1,9 +1,22 @@
-import type { PaymentPayload, PartnerDebtsResponse } from '../types/paymentTypes';
+import type {
+    PartnerAdvanceDebtsResponse,
+    PartnerDebtsResponse,
+    PaymentPayload
+} from '../types/paymentTypes';
 import api from '@/lib/axios';
 
 export const paymentService = {
-    getPartnerDebts: async (acc: number): Promise<PartnerDebtsResponse> => {
-        const response = await api.get<PartnerDebtsResponse>(`/partners/debs/${acc}`);
+    getPartnerDebts: async (acc: number, adelanto = 0): Promise<PartnerDebtsResponse> => {
+        const response = await api.get<PartnerDebtsResponse>(`/partners/debs/${acc}`, {
+            params: { adelanto }
+        });
+        return response.data;
+    },
+
+    getPartnerAdvanceDebts: async (acc: number, adelanto = 12): Promise<PartnerAdvanceDebtsResponse> => {
+        const response = await api.get<PartnerAdvanceDebtsResponse>(`/partners/debs/advance/${acc}`, {
+            params: { adelanto }
+        });
         return response.data;
     },
 

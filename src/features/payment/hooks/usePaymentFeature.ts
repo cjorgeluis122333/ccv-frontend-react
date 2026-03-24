@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import type { Debt, PaymentItemPayload, PaymentPayload } from '../types/paymentTypes';
 import { formatToYearMonth } from '@/utils/dateUtils';
 import type { PaymentFormValues } from '../schemas/paymentSchema';
@@ -10,11 +10,11 @@ type PaymentOperatorInfo = {
 export const usePaymentFeature = (userInfo: PaymentOperatorInfo) => {
     const [selectedDebts, setSelectedDebts] = useState<Debt[]>([]);
 
-    const selectSingleDebt = (debt: Debt) => {
+    const selectSingleDebt = useCallback((debt: Debt) => {
         setSelectedDebts([debt]);
-    };
+    }, []);
 
-    const toggleDebtSelection = (debt: Debt) => {
+    const toggleDebtSelection = useCallback((debt: Debt) => {
         setSelectedDebts(prev => {
             const exists = prev.find(d => d.mes === debt.mes);
             if (exists) {
@@ -23,9 +23,11 @@ export const usePaymentFeature = (userInfo: PaymentOperatorInfo) => {
 
             return [...prev, debt].sort((a, b) => a.mes.localeCompare(b.mes));
         });
-    };
+    }, []);
 
-    const clearSelection = () => setSelectedDebts([]);
+    const clearSelection = useCallback(() => {
+        setSelectedDebts([]);
+    }, []);
 
     const isSingleSelection = selectedDebts.length === 1;
     const isMultiSelection = selectedDebts.length > 1;
@@ -36,7 +38,7 @@ export const usePaymentFeature = (userInfo: PaymentOperatorInfo) => {
         return Number(total.toFixed(2));
     }, [selectedDebts]);
 
-    const generateDescription = (singleMonthSelection?: string) => {
+    const generateDescription = useCallback((singleMonthSelection?: string) => {
         if (isSingleSelection) {
             return `Monto de la cuota del mes ${selectedDebts[0].mes}`;
         }
@@ -51,9 +53,9 @@ export const usePaymentFeature = (userInfo: PaymentOperatorInfo) => {
         }
 
         return '';
-    };
+    }, [isMultiSelection, isSingleSelection, selectedDebts]);
 
-    const calculateDistribution = (montoPagado: number) => {
+    const calculateDistribution = useCallback((montoPagado: number) => {
         let remaining = montoPagado;
         const distribution: PaymentItemPayload[] = [];
         const totalDebt = selectedDebts.reduce((sum, debt) => sum + debt.deuda_pendiente, 0);
@@ -86,9 +88,9 @@ export const usePaymentFeature = (userInfo: PaymentOperatorInfo) => {
         }
 
         return { distribution: [], abono: 0 };
-    };
+    }, [isMultiSelection, isSingleSelection, selectedDebts]);
 
-    const buildPayload = (
+    const buildPayload = useCallback((
         data: PaymentFormValues,
         acc: number,
         manualMonth?: string
@@ -118,7 +120,7 @@ export const usePaymentFeature = (userInfo: PaymentOperatorInfo) => {
             operador: userInfo?.name || 'Operador',
             pagos
         };
-    };
+    }, [calculateDistribution, hasSelection, userInfo]);
 
     return {
         selectedDebts,
