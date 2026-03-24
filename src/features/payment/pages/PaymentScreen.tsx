@@ -15,7 +15,7 @@ import { paymentService } from '../services/paymentService';
 import type { Debt } from '../types/paymentTypes';
 
 const mockUserInfo = { name: "Jorge" };
-const DEFAULT_ADVANCE_MONTHS = '10';
+const DEFAULT_ADVANCE_MONTHS = '12';
 
 type PaymentModalConfig = {
     isOpen: boolean;
