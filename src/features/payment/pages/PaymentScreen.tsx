@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type ChangeEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { InputSearch } from "@/components/input/InputSearch.tsx";
 import { usePartners } from '@/features/partner/hooks/usePartners';
@@ -13,6 +13,7 @@ import { usePaymentFeature } from '../hooks/usePaymentFeature';
 import type { PaymentFormValues } from '../schemas/paymentSchema';
 import { paymentService } from '../services/paymentService';
 import type { Debt } from '../types/paymentTypes';
+import {AdvanceMonthsFilter} from "@/components/input/AdvanceMonthsFilter.tsx";
 
 const mockUserInfo = { name: "Jorge" };
 const DEFAULT_ADVANCE_MONTHS = '12';
@@ -176,12 +177,9 @@ export const PaymentScreen = () => {
         }
     }, [clearSelection, loadCurrentDebts, selectedPartner]);
 
-    const handleAdvanceMonthsChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
-        const nextValue = event.target.value;
 
-        if (nextValue === '' || /^\d+$/.test(nextValue)) {
-            setAdvanceMonthsInput(nextValue);
-        }
+    const handleApplyFilter = useCallback((nextValue: number) => {
+        setAdvanceMonthsInput(nextValue.toString());
     }, []);
 
     const handlePaymentSubmit = async (data: PaymentFormValues) => {
@@ -373,27 +371,11 @@ export const PaymentScreen = () => {
                                 />
 
                                 {activeSection === 'future' && (
-                                    <div className="rounded-xl border border-slate-200 bg-white p-4 space-y-3">
-                                        <div className="space-y-1">
-                                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                                                <span className="material-symbols-rounded text-[1.2em]">schedule</span>
-                                                Meses por adelanto
-                                            </label>
-                                            <input
-                                                type="number"
-                                                min="0"
-                                                step="1"
-                                                inputMode="numeric"
-                                                value={advanceMonthsInput}
-                                                onChange={handleAdvanceMonthsChange}
-                                                placeholder="0"
-                                                className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-all shadow-sm hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-                                            />
-                                        </div>
-                                        <p className="text-xs text-slate-500 font-medium">
-                                            Este valor se envia como parametro <code>adelanto</code> al listar las deudas futuras.
-                                        </p>
-                                    </div>
+                                    <AdvanceMonthsFilter
+                                        initialValue={advanceMonthsInput}
+                                        onApply={handleApplyFilter} // Conectamos la nueva función
+                                        isLoading={isDebtsLoading}  // Pasamos el estado de carga de tu petición
+                                    />
                                 )}
                             </div>
                         </div>
