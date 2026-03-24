@@ -1,7 +1,7 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface AdvanceMonthsFilterProps {
-    initialValue: string;
+    initialValue: number;
     onApply: (months: number) => void;
     isLoading?: boolean;
 }
@@ -11,10 +11,10 @@ export const AdvanceMonthsFilter: React.FC<AdvanceMonthsFilterProps> = ({
                                                                             onApply,
                                                                             isLoading = false
                                                                         }) => {
-    // Estado local para evitar renders en el padre y peticiones prematuras
+    // Estado local para el "borrador" del input
     const [localValue, setLocalValue] = useState<number | string>(initialValue);
 
-    // Mantenemos sincronizado el estado local si el padre se reinicia o cambia desde fuera
+    // Sincronización: Si el padre cambia el valor (ej. al limpiar filtros), actualizamos el local
     useEffect(() => {
         setLocalValue(initialValue);
     }, [initialValue]);
@@ -42,7 +42,7 @@ export const AdvanceMonthsFilter: React.FC<AdvanceMonthsFilterProps> = ({
                     <span className="material-symbols-rounded text-[1.4em]">event_upcoming</span>
                     Meses por adelanto
                 </label>
-                <div className="flex gap-3">
+                <div className="flex gap-2">
                     <input
                         type="number"
                         min="0"
