@@ -7,6 +7,7 @@ import { PartnersList } from '@/features/partner/pages/PartnersList';
 import { PartnerDataScreen } from '@/features/partner/pages/PartnerDataScreen';
 import { BoardScreen } from '@/features/directivo/pages/BoardScreen';
 import { PaymentScreen } from '@/features/payment/pages/PaymentScreen';
+import { GuestScreen } from '@/features/guest/pages/GuestScreen';
 
 export const AppRouter = () => {
     return (
@@ -36,7 +37,7 @@ export const AppRouter = () => {
                 <Route path="/socios/directivos" element={<BoardScreen />} />
 
                 {/* Generales */}
-                <Route path="/invitados" element={<div>Gestión de Invitados</div>} />
+                <Route path="/invitados" element={<GuestScreen />} />
                 <Route path="/notificaciones" element={<div>Mis Notificaciones</div>} />
                 <Route path="/mi-cuenta" element={<div>Perfil de Usuario</div>} />
             </Route>
