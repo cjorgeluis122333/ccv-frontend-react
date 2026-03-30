@@ -28,6 +28,7 @@ export const GuestScreen = () => {
 
     // Guest Feature State
     const [activeSection, setActiveSection] = useState<GuestSection>('ingreso');
+    const [loadedSections, setLoadedSections] = useState<{ ingreso: boolean; lista: boolean }>({ ingreso: false, lista: false });
     const {
         currentGuests,
         isCurrentLoading,
@@ -79,19 +80,23 @@ export const GuestScreen = () => {
         setSearchTerm(partner.nombre);
         setIsDropdownOpen(false);
         setActiveSection('ingreso');
+        clearGuestData();
+        setLoadedSections({ ingreso: true, lista: false });
         void loadCurrentMonthGuests(partner.acc);
-    }, [loadCurrentMonthGuests, setIsDropdownOpen, setSearchTerm]);
+    }, [clearGuestData, loadCurrentMonthGuests, setIsDropdownOpen, setSearchTerm]);
 
     const handleSectionChange = useCallback((section: GuestSection) => {
         setActiveSection(section);
         if (!selectedPartner) return;
 
-        if (section === 'ingreso') {
+        if (section === 'ingreso' && !loadedSections.ingreso) {
+            setLoadedSections(prev => ({ ...prev, ingreso: true }));
             void loadCurrentMonthGuests(selectedPartner.acc);
-        } else {
+        } else if (section === 'lista' && !loadedSections.lista) {
+            setLoadedSections(prev => ({ ...prev, lista: true }));
             void loadPaginatedGuests(selectedPartner.acc, 1);
         }
-    }, [loadCurrentMonthGuests, loadPaginatedGuests, selectedPartner]);
+    }, [loadedSections, loadCurrentMonthGuests, loadPaginatedGuests, selectedPartner]);
 
     const handleFormSubmit = async (data: Omit<GuestPayload, 'acc' | 'fuente' | 'operador'>) => {
         if (!selectedPartner) return;
@@ -112,6 +117,7 @@ export const GuestScreen = () => {
                 title: 'Invitado Registrado',
                 message: 'El invitado ha sido registrado correctamente para este mes.'
             });
+            setLoadedSections({ ingreso: true, lista: false }); // Invalida historial, refetching Ingreso
             void loadCurrentMonthGuests(selectedPartner.acc);
         } else {
             setModalConfig({
