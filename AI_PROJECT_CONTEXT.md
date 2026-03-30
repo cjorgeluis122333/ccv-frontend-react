@@ -51,5 +51,23 @@ El proyecto utiliza una arquitectura altamente modular y encapsulada por dominio
 4.  Agrega la URL a `src/router/AppRouter.tsx` bajo la sección correspondiente (Pública o Privada).
 5.  Mantén el estado y tipos aislados en su respectiva subcarpeta dentro del feature.
 
+## 5. Estrategias de Optimización y Caché (Mandatorio)
+
+Para garantizar una experiencia de usuario fluida y evitar peticiones redundantes al servidor, se han establecido las siguientes reglas de implementación:
+
+### Paginación con Caché (Pattern: Record-based Cache)
+**Regla:** Toda sección que utilice paginación DEBE implementar un sistema de caché en el hook encargado de los datos.
+*   **Estado del Hook:** Utilizar un objeto `Record<number, PaginatedResponse>` para almacenar las páginas ya consultadas.
+*   **Lógica de Carga:** Antes de realizar una petición Axios, verificar si la página ya existe en el objeto de caché. Si existe, simplemente actualizar el estado de la 'página actual' sin disparar una petición de red.
+*   **Invalidación:** La caché debe limpiarse (`{} `) únicamente cuando:
+    1. Se detecta un cambio de "Socio" o entidad principal.
+    2. Se realiza una operación de escritura exitosa (POST/PUT/DELETE) que afecte los datos de esa lista.
+
+### Persistencia entre Pestañas (Pattern: Tab State Tracking)
+**Regla:** Si una pantalla tiene múltiples secciones (Tabs) que cargan datos diferentes, el componente debe recordar qué secciones ya fueron cargadas.
+*   **Estado del Componente:** Usar un estado `loadedSections` (ej. `{ ingreso: boolean; historial: boolean }`).
+*   **Lógica:** Solo invocar las funciones de carga del hook si el flag de la sección correspondiente es `false`. Una vez cargada, cambiar a `true`.
+*   **Invalidación:** Reiniciar todos los flags a `false` al cambiar de Socio o tras una inserción exitosa si es necesario refrescar el contexto global.
+
 ---
 **Nota para la IA:** No reinventes la rueda. Si vas a hacer peticiones, busca el hook/servicio existente. Si vas a validar, busca/crea un esquema Zod. Si vas a añadir estilos, usa Tailwind.
