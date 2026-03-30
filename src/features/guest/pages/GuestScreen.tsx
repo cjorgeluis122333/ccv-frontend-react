@@ -11,6 +11,7 @@ import { GuestHistoryList } from '../components/GuestHistoryList';
 import { useGuestFeature } from '../hooks/useGuestFeature';
 import type { GuestPayload } from '../types/guestTypes';
 import { PaymentFeedbackModal } from '@/features/payment/components/PaymentFeedbackModal';
+import { authService } from '@/features/auth/services/authService';
 
 type GuestSection = 'ingreso' | 'lista';
 
@@ -101,11 +102,12 @@ export const GuestScreen = () => {
     const handleFormSubmit = async (data: Omit<GuestPayload, 'acc' | 'fuente' | 'operador'>) => {
         if (!selectedPartner) return;
 
+        const userInfo = authService.getUser();
         const payload: GuestPayload = {
             ...data,
             acc: selectedPartner.acc,
-            fuente: 'freevar',       // Requisito del endpoint
-            operador: 'marisabel',   // Requisito del endpoint o info del usuario
+            fuente: null,
+            operador: userInfo?.name || 'Sistema',
         };
 
         const success = await registerNewGuest(payload);

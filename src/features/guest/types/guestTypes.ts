@@ -13,7 +13,7 @@ export interface GuestPayload {
     nombre: string;
     fecha: string;
     acc: number;
-    fuente: string;
+    fuente: string | null;
     operador: string;
 }
 

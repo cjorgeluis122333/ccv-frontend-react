@@ -18,7 +18,11 @@ export const GuestForm = ({ onSubmit, isSubmitting, serverErrors }: GuestFormPro
         register,
         handleSubmit,
         formState: { errors }
-    } = useForm<FormValues>();
+    } = useForm<FormValues>({
+        defaultValues: {
+            fecha: new Date().toISOString().split('T')[0]
+        }
+    });
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
