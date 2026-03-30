@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { InputSearch } from "@/components/input/InputSearch.tsx";
 import { usePartners } from '@/features/partner/hooks/usePartners';
 import type { Partner } from '@/features/partner/types/partnerResponseType';
@@ -39,9 +39,11 @@ export const GuestScreen = () => {
         paginatedError,
         isSubmitting,
         serverErrors,
+        guestCatalog,
         loadCurrentMonthGuests,
         loadPaginatedGuests,
         registerNewGuest,
+        loadGuestCatalog,
         clearGuestData
     } = useGuestFeature();
 
@@ -51,6 +53,10 @@ export const GuestScreen = () => {
         message: '',
         title: undefined
     });
+
+    useEffect(() => {
+        void loadGuestCatalog();
+    }, [loadGuestCatalog]);
 
     const handleSearchReset = useCallback(() => {
         setSelectedPartner(null);
@@ -266,6 +272,7 @@ export const GuestScreen = () => {
                                             onSubmit={handleFormSubmit}
                                             isSubmitting={isSubmitting}
                                             serverErrors={serverErrors}
+                                            guestCatalog={guestCatalog}
                                         />
                                     </div>
                                     

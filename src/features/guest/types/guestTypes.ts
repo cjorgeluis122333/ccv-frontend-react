@@ -17,6 +17,15 @@ export interface GuestPayload {
     operador: string;
 }
 
+export interface RegisteredGuest {
+    ind: number;
+    cedula: string;
+    nombre: string;
+    acc: number;
+    last_time: string;
+    operador: string;
+}
+
 export interface GuestYearData {
     anio: number;
     meses: Record<string, Guest[]>;

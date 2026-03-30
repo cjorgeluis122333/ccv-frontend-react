@@ -1,5 +1,5 @@
 import api from '@/lib/axios';
-import type { Guest, GuestPaginatedResponse, GuestPayload } from '../types/guestTypes';
+import type { Guest, GuestPaginatedResponse, GuestPayload, RegisteredGuest } from '../types/guestTypes';
 
 export const guestService = {
     // Ingreso - Obtener invitados del mes
@@ -19,6 +19,12 @@ export const guestService = {
         const response = await api.get(`/guest/${acc}`, {
             params: { page }
         });
+        return response.data;
+    },
+
+    // Catálogo - Obtener todos los invitados registrados
+    getGuestCatalog: async (): Promise<{ status: string; message: string; data: RegisteredGuest[] }> => {
+        const response = await api.get('/register-guest');
         return response.data;
     }
 };

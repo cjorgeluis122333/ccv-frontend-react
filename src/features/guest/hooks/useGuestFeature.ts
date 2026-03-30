@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import axios from 'axios';
 import { guestService } from '../services/guestService';
-import type { Guest, GuestPaginatedResponse, GuestPayload } from '../types/guestTypes';
+import type { Guest, GuestPaginatedResponse, GuestPayload, RegisteredGuest } from '../types/guestTypes';
 
 export const useGuestFeature = () => {
     // Current month guests state
@@ -21,6 +21,10 @@ export const useGuestFeature = () => {
     // Form submission state
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [serverErrors, setServerErrors] = useState<Record<string, string[]> | undefined>();
+
+    // Global Guest Catalog state
+    const [guestCatalog, setGuestCatalog] = useState<RegisteredGuest[]>([]);
+    const [isCatalogLoading, setIsCatalogLoading] = useState(false);
 
     const loadCurrentMonthGuests = useCallback(async (acc: number) => {
         setIsCurrentLoading(true);
@@ -87,6 +91,19 @@ export const useGuestFeature = () => {
         }
     };
 
+    const loadGuestCatalog = useCallback(async () => {
+        if (guestCatalog.length > 0) return; // Cached if already loaded
+        setIsCatalogLoading(true);
+        try {
+            const response = await guestService.getGuestCatalog();
+            setGuestCatalog(response.data || []);
+        } catch (error: unknown) {
+            console.error('Error loading guest catalog:', error);
+        } finally {
+            setIsCatalogLoading(false);
+        }
+    }, [guestCatalog.length]);
+
     const clearGuestData = useCallback(() => {
         setCurrentGuests([]);
         setHistoryCache({});
@@ -109,10 +126,14 @@ export const useGuestFeature = () => {
         isSubmitting,
         serverErrors,
 
+        guestCatalog,
+        isCatalogLoading,
+
         // Actions
         loadCurrentMonthGuests,
         loadPaginatedGuests,
         registerNewGuest,
+        loadGuestCatalog,
         clearGuestData
     };
 };
