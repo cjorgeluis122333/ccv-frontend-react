@@ -117,7 +117,11 @@ export const GuestScreen = () => {
                 title: 'Invitado Registrado',
                 message: 'El invitado ha sido registrado correctamente para este mes.'
             });
-            setLoadedSections({ ingreso: true, lista: false }); // Invalida historial, refetching Ingreso
+            // Al insertar, marcamos que el historial debe refrescarse
+            setLoadedSections({ ingreso: true, lista: false }); 
+            clearGuestData(); // Limpia caches y estados previos
+            setLoadedSections({ ingreso: true, lista: false }); // Volvemos a marcar ingreso como cargado (lo haremos abajo)
+            
             void loadCurrentMonthGuests(selectedPartner.acc);
         } else {
             setModalConfig({

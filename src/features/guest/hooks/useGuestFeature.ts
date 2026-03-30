@@ -9,10 +9,14 @@ export const useGuestFeature = () => {
     const [isCurrentLoading, setIsCurrentLoading] = useState(false);
     const [currentError, setCurrentError] = useState<string | null>(null);
 
-    // Paginated guests state
-    const [paginatedGuests, setPaginatedGuests] = useState<GuestPaginatedResponse | null>(null);
+    // Paginated history cache
+    const [historyCache, setHistoryCache] = useState<Record<number, GuestPaginatedResponse>>({});
+    const [currentPage, setCurrentPage] = useState<number>(1);
     const [isPaginatedLoading, setIsPaginatedLoading] = useState(false);
     const [paginatedError, setPaginatedError] = useState<string | null>(null);
+
+    // Derived state for the view
+    const paginatedGuests = historyCache[currentPage] || null;
 
     // Form submission state
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,16 +41,22 @@ export const useGuestFeature = () => {
         }
     }, []);
 
-    const loadPaginatedGuests = useCallback(async (acc: number, page: number = 1) => {
+    const loadPaginatedGuests = useCallback(async (acc: number, page: number = 1, force: boolean = false) => {
+        // If we already have the page and not forced, just switch the view
+        if (historyCache[page] && !force) {
+            setCurrentPage(page);
+            return;
+        }
+
         setIsPaginatedLoading(true);
         setPaginatedError(null);
         try {
             const response = await guestService.getGuestsPaginated(acc, page);
             if (response.success) {
-                setPaginatedGuests(response.data);
+                setHistoryCache(prev => ({ ...prev, [page]: response.data }));
+                setCurrentPage(page);
             } else {
                 setPaginatedError('Error al cargar la lista de invitados.');
-                setPaginatedGuests(null);
             }
         } catch (error: unknown) {
             console.error('Error loading paginated guests:', error);
@@ -55,11 +65,10 @@ export const useGuestFeature = () => {
             } else {
                 setPaginatedError('Ocurrió un error inesperado.');
             }
-            setPaginatedGuests(null);
         } finally {
             setIsPaginatedLoading(false);
         }
-    }, []);
+    }, [historyCache]);
 
     const registerNewGuest = async (payload: GuestPayload): Promise<boolean> => {
         setIsSubmitting(true);
@@ -80,7 +89,8 @@ export const useGuestFeature = () => {
 
     const clearGuestData = useCallback(() => {
         setCurrentGuests([]);
-        setPaginatedGuests(null);
+        setHistoryCache({});
+        setCurrentPage(1);
         setCurrentError(null);
         setPaginatedError(null);
         setServerErrors(undefined);
