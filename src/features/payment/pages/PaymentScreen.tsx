@@ -372,7 +372,7 @@ export const PaymentScreen = () => {
 
                                 {activeSection === 'future' && (
                                     <AdvanceMonthsFilter
-                                        initialValue={advanceMonthsInput}
+                                        initialValue={normalizedAdvanceMonths}
                                         onApply={handleApplyFilter} // Conectamos la nueva función
                                         isLoading={isDebtsLoading}  // Pasamos el estado de carga de tu petición
                                     />
